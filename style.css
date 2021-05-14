@@ -46,10 +46,6 @@ button {
 	font-weight: 500;
 }
 
-#status-icon {
-	font-size: 15px;
-}
-
 #api-validation {
 	background-color: #e8e7df;
 	border-top: 1px solid #ddddd5;
@@ -123,6 +119,10 @@ button {
 }
 .header-actions div {
 	margin-left: 15px;
+}
+
+#status-icon {
+	font-size: 15px;
 }
 
 .content {
