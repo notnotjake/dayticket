@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<!--Site Info-->
+		<meta charset="utf-8">
+		<title>Day Ticket Entry</title>
+		<meta name="description" content="Enter in timesheet data then print or export to QuickBooks bill">
+		<link rel="canonical" href="https://dayticket.advanceas.com/">
+		<!--Appearance-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="apple-touch-icon" href="https://www.advanceas.com/images/logo.png">
+		<link rel="icon" type="image/png" sizes="271x271" href="https://www.advanceas.com/images/logo.png">
+		<!-- OpenGraph -->
+		<meta property="og:title" content="Advance • Day Ticket Entry">
+		<meta property="og:site_name" content="Advance">
+		<meta property="og:url" content="https://dayticket.advnaceas.com/">
+		<meta property="og:type" content="website">
+		<meta property="og:description" content="Enter in timesheet data then print or export to QuickBooks bill">
+		<meta property="og:image" content="https://www.advanceas.com/images/logo.png">
+	</head>
+	
+	
+	<body>
+		<div class="header">
+			<form class="header-input">
+				<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
+				<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
+				<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
+			</form>
+			<div class="header-actions">
+				<div class="header-more">
+					<button id="status-icon" title="You're connected"><i class="bi bi-cloud-check-fill""></i></button>
+				</div>
+				<div class="button-wrapper">
+					<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
+				</div>
+				<div class="button-wrapper">
+					<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
+				</div>
+				<div class="button-wrapper">
+					<button id="clearButton">Clear</button>
+				</div>
+			</div>
+		</div>
+		
+		<div id="api-validation">
+			<label for="api-key">Security Key</label>
+			<input type="text" id="api-key" name="api-key" placeholder="Enter your validation key">
+			<button id="enroll-submit"><i class="bi bi-cloud-plus-fill"></i>&nbsp Enroll</button>
+		</div>
+		
+		<div class="content">
+			<h1 id="js-enabled">Enable JavaScript to use page</h1>
+			<div id="materials-table"></div>
+			<div id="labor-table">
+				<table>
+					<tr>
+						<td colspan="2" class="table-section">Labor</td>
+					</tr>
+					<tr>
+						<form>
+							<td class="qty">
+								<input type="number" min="1" id="labor-hours-qty" required>
+							</td>
+							<td>
+								<label for="labor-hours-qty">
+									Helper ( $12 / hour )
+								</label>
+							</td>
+						</form>
+					</tr>
+				</table>
+			</div>
+		</div>
+		
+		
+		<div id="to-print"></div>
+				
+		<script type="text/javascript" src="app.js"></script>
+	</body>
+</html>

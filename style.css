@@ -1,0 +1,208 @@
+@import url('https://rsms.me/inter/inter.css');
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css");
+html {
+	font-family: 'Inter', sans-serif;
+}
+@supports (font-variation-settings: normal) {
+		html {
+			font-family: 'Inter var', sans-serif;
+		}
+}
+
+// - - Page - -
+body {
+	width: auto;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	position: relative;
+}
+body {
+	background-color: #fbf9f1;
+}
+
+.header {
+	background-color: #f8f3dd;
+	height: 40pt;
+	margin: 10pt 30pt 0pt;
+	border-bottom: 1px solid #dad9cf;
+	border-top: 1px solid #dad9cf;
+	padding: 0 8pt;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+button, input, select, textarea {
+	font-family: inherit;
+	font-size: 100%;
+}
+button {
+	cursor: pointer;
+	border: none;
+	background-color: transparent;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+#status-icon {
+	font-size: 15px;
+}
+
+#api-validation {
+	background-color: #e8e7df;
+	border-top: 1px solid #ddddd5;
+	border-bottom: 1px solid #ddddd5;
+	height: 40px;
+	margin: 10px 30pt;
+	padding: 1px;
+	display: none;
+	justify-content: center;
+	align-items: center;
+}
+#api-validation input {
+	height: 40px;
+	background-color: #f0efeb;
+	//background-color: #e0f1e2;
+	border: none;
+	padding-left: 7px;
+	margin: 0 10px;
+}
+#enroll-submit {
+	height: 30px;
+	background-color: #ffffff;
+	color: #23ad3e;
+	padding: 0 8px;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
+	border: 1px solid #eff7ef;
+}
+
+
+
+
+.header-input, .header-actions {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+#builder-name {
+	margin: 0 10px;
+}
+
+
+.header-input input {
+	height: 20pt;
+	background-color: #fbfaf3;
+	border: 1px solid #e0e0e0;
+	padding: 2pt 5pt;
+	font-weight: 500;
+	font-size: 13px;
+	border-radius: 4px;
+}
+
+.button-wrapper {
+	height: fit-content;
+	border-top: 1px solid #e7e7e7;
+	border-bottom: 1px solid #d1d1d1;
+	border-radius: 5px;
+	background-color: #ffffff;
+}
+.header-actions button {
+	border: none;
+	background-color: transparent;
+	text-decoration: none;
+	padding: 6pt 10pt;
+	font-size: 13px;
+	font-weight: 500;
+	color: #404039;
+	cursor: pointer;
+}
+.header-actions div {
+	margin-left: 15px;
+}
+
+.content {
+	width: auto;
+	height: auto;
+	margin: 20pt 30pt;
+	max-width: 800pt;
+	font-size: 12px;
+}
+.content h1 {
+	text-align: center;
+}
+
+#materials-table {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	height: 150vh;
+	width: fit-content;
+}
+
+table {
+	background-color: #e8e7df;
+	font-size: 12px;
+	margin-bottom: 3pt;
+	margin-right: 5pt;
+}
+th {
+	text-align: left;
+	font-weight: 500;
+}
+
+table, th, td {
+	border-bottom: 1px solid #cccccc;
+	border-collapse: collapse;
+	padding: 5px 5px;
+}
+td {
+	width: 160pt;
+}
+td.qty {
+	padding: 0;
+	margin: 0;
+	background-color: #f0efeb;
+	width: 30pt;
+	height: 10pt;
+	text-align: right;
+	vertical-align: top;
+}
+td.table-section {
+	font-weight: 500;
+	border-bottom: 1px solid #b7b7b7;
+	background-color: #dbe3e6;
+}
+
+.column-1 {
+	
+}
+
+.content form {
+	width: 30pt;
+	height: 100%;
+	//background-color: #f0efeb;
+}
+
+.content input {
+	//display: table-cell;
+	font-size: 11px;
+	height: calc(100% - 1pt);
+	width: 30pt;
+	padding: 0;
+	padding-right: 4pt;
+	margin: 0;
+	background-color: #f0efeb;
+	border: none;
+	text-align: right;
+	
+}
+
+input[type=number]:valid {
+	background-color: #f6ed6c;
+}
