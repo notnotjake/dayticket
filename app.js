@@ -231,6 +231,7 @@ const DATA = {
 				VIEW.table(resData.records)
 			})
 			.catch(err => {
+				VIEW.setToolbar()
 				console.log(err)
 			})
 	}
