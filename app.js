@@ -59,7 +59,7 @@ const APP = {
 				}
 			})
 			.then(responseData => {
-				dataObj.json = responseData.records
+				dataObj.data = responseData.records
 				APP.useData(responseData.records, dataObj)
 			})
 			.catch(err => {
@@ -69,7 +69,8 @@ const APP = {
 	},
 	useData: function (data, dataObj) {
 		console.log(dataObj.name + " Data Retrieved Successfully:")
-		VIEW.table(dataObj.json)
+		dataObj.parseData()
+		VIEW.table(dataObj)
 	}
 }
 
@@ -168,8 +169,8 @@ const VIEW = {
 			document.querySelector('#connection-status-description').style.display = 'none'
 		})
 	},
-	table: function(data) {
-		console.log(data)
+	table: function(dataObj) {
+		document.querySelector('.content').innerHTML = (dataObj.data)
 	}
 }
 
@@ -188,13 +189,31 @@ const DATA = {
 	materials: {
 		name: 'materials',
 		AT: materialsAT,
-		json: []
-		},
+		data: [],
+		parseData: function () {
+			let dataReturned = []
+			DATA.materials.data.forEach((i) => {
+				dataReturned.push(i.fields.name)
+			})
+			DATA.materials.data = dataReturned
+			
+			return DATA.materials.data
+		}
+	},
 	labor: {
 		name: 'labor',
 		AT: laborAT,
-		json: []
-		},
+		data: [],
+		parseData: function () {
+			let dataReturned = []
+			DATA.labor.data.forEach((i) => {
+				dataReturned.push(i.fields['Employee Name'])
+			})
+			DATA.labor.data = dataReturned
+			
+			return DATA.labor.data
+		}
+	},
 	
 	cookies: document.cookie,	
 	freshCookies: function () {
