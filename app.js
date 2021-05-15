@@ -31,8 +31,9 @@ const APP = {
 	getData: function () {
 		if ( DATA.isKeyValid() ) {
 			DATA.loadJSON(DATA.airtableTables[0])
-		} 
-		VIEW.setToolbar()
+		} else {
+			VIEW.updateToolbar()
+		}
 	}
 }
 
@@ -52,7 +53,7 @@ const VIEW = {
 	removeJSDisabledMessage: function () {
 		document.querySelector('#js-enabled').style.display = 'none'
 	},
-	setToolbar: function () {
+	updateToolbar: function () {
 		if (DATA.connectionStatus == 'connected') {
 			VIEW.setToolbarActive()
 		} else {
@@ -148,9 +149,7 @@ const DATA = {
 	keyName: "apiKey",
 	key: '',
 	dataObj: [],
-	cookies: document.cookie,
-	isConnected: false,
-	
+	cookies: document.cookie,	
 	airtableURL: '',
 	airtableTables: [],
 	
@@ -220,8 +219,7 @@ const DATA = {
 					throw Error("Something went wrong" + response.status + " - " + response.statusText)
 				}
 				DATA.connectionStatus = 'connected'
-				VIEW.setToolbar()
-				DATA.isConnected = true
+				VIEW.updateToolbar()
 				console.log("Data retrieved successfully")
 				return response.json()
 			})
@@ -231,7 +229,7 @@ const DATA = {
 				VIEW.table(resData.records)
 			})
 			.catch(err => {
-				VIEW.setToolbar()
+				VIEW.updateToolbar()
 				console.log(err)
 			})
 	}
