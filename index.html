@@ -22,61 +22,22 @@
 	
 	
 	<body>
-		<div class="header">
-			<form class="header-input">
-				<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
-				<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
-				<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
-			</form>
-			<div class="header-actions">
-				<div class="header-more">
-					<button id="status-icon" title="You're connected"><i class="bi bi-cloud-check-fill""></i></button>
-				</div>
-				<div class="button-wrapper">
-					<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
-				</div>
-				<div class="button-wrapper">
-					<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
-				</div>
-				<div class="button-wrapper">
-					<button id="clearButton">Clear</button>
-				</div>
+		<div id="container">
+			<h1 id="js-enabled" style="text-align:center;">Enable JavaScript to Load App</h1>
+			
+			<div id="toolbar">
+				<p id="status-app-loading" style=""><span style="letter-spacing:10px;"><i class="bi bi-moon-stars-fill" style="color:#786BB4;"></i></span>App Loading</p>
 			</div>
-		</div>
-		
-		<div id="api-validation">
-			<label for="api-key">Security Key</label>
-			<input type="text" id="api-key" name="api-key" placeholder="Enter your validation key">
-			<button id="enroll-submit"><i class="bi bi-cloud-plus-fill"></i>&nbsp Enroll</button>
-		</div>
-		
-		<div class="content">
-			<h1 id="js-enabled">Enable JavaScript to use page</h1>
-			<div id="materials-table"></div>
-			<div id="labor-table">
-				<table>
-					<tr>
-						<td colspan="2" class="table-section">Labor</td>
-					</tr>
-					<tr>
-						<form>
-							<td class="qty">
-								<input type="number" min="1" id="labor-hours-qty" required>
-							</td>
-							<td>
-								<label for="labor-hours-qty">
-									Helper ( $12 / hour )
-								</label>
-							</td>
-						</form>
-					</tr>
-				</table>
+			
+			<div id="error-hint" class="error-hint">
+				<h2><span style="letter-spacing:10px;"><i id="error-hint-icon" class="bi bi-exclamation-diamond-fill"></i></span><span id="error-hint-text">Key is Required</span></h2>
 			</div>
-		</div>
-		
-		
-		<div id="to-print"></div>
+			
+			<div class="content">
 				
+			</div>
+			
+		</div>
 		<script type="text/javascript" src="app.js"></script>
 	</body>
 </html>

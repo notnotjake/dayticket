@@ -1,82 +1,131 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// * * Overview  * * * * * * * * * * * * * * * * * * * * * * 
+// APP - handles the flow of the page
+// VIEW - handles changes that the user sees
+// DATA - handles anything related to airtable, cookies, and data
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// * * Set Variables * * * * * * * * * * * * * * * * * * * *
+const airtableURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' //the URL of the airtable project
+const airtableTables = ['Materials', 'Labor'] //airtableTables - array of the table's names you want to load
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // ## APP
 // Responsible for main controlling of the page
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const APP = {
-	init: function () {
-		DRAW.setDatePicker()
-		DRAW.setStatusIcon()
-		DRAW.removeJSDisabledMessage()
-		APP.addListeners()
+	init: function (url, tables) {
+		// Set some things up initially
+		DATA.airtableURL = url
+		DATA.airtableTables = tables
 		
+		VIEW.removeJSDisabledMessage()
+		
+		// Draw Toolbar
+		VIEW.setToolbar()
+		// Start by getting the data from AirTable
 		APP.getData()
 		
 	},
 	getData: function () {
 		if ( DATA.isKeyValid() ) {
-			DRAW.hideAuth()
-			DATA.loadJSON("Materials")
+			DATA.loadJSON(DATA.airtableTables[0])
+			VIEW.setToolbar()
 		} else {
-			DRAW.showAuth()
+			VIEW.setToolbar()
 		}
-	},
-	addListeners: function () {
-		document.querySelector('#status-icon').addEventListener('click', () => {
-			if (document.querySelector('#api-validation').style.display == "none") { DRAW.showAuth() }
-			else { DRAW.hideAuth() }
-		})
 	}
 }
 
+
+
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// ## DRAW
+// ## VIEW
 // Responsible for changing things on screen
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const DRAW = {
+const VIEW = {
 	setDatePicker: function () {
 		var dateField = document.querySelector('#date')
 		var date = new Date()
 		dateField.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0)
 	},
 	removeJSDisabledMessage: function () {
-		document.querySelector('#js-enabled').innerHTML = ""
+		document.querySelector('#js-enabled').style.display = 'none'
 	},
-	setStatusIcon: function (status) {
-		let statusSet = '<i class="bi bi-moon-stars-fill" style="color:#786BB4;"></i>'
-		if (status == "nokey") {
-			statusSet = '<i class="bi bi-shield-lock-fill" style="color: #FFBE31;"></i>'
-		} else if (status == "badkey") {
-			statusSet = '<i class="bi bi-exclamation-diamond-fill" style="color:#eaa017;"></i>'
-		} else if (status == "connected") {
-			statusSet = '<i class="bi bi-cloud-check-fill" style="color:#19b851;"></i>'
-		}
-		document.querySelector('#status-icon').innerHTML = statusSet
-	},
-	hideAuth: function () {
-		document.querySelector('#api-validation').style.display = "none"
-	},
-	showAuth: function () {
-		document.querySelector('#api-validation').style.display = "flex"
-		
-		if (DATA.isConnected) {
-			document.querySelector('#api-key').value = DATA.key
-			DRAW.setStatusIcon("connected")
+	setToolbar: function () {
+		if (DATA.connectionStatus == 'connected') {
+			document.querySelector('#toolbar').innerHTML = `
+			<form class="form-wrapper toolbar-actions">
+				<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
+				<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
+				<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
+			</form>
+			
+			<div id="toolbar-functions" class="toolbar-actions">
+				<div id="connection-status" class="toolbar-actions">
+					<div id="connection-status-button">
+						<p id="connection-status-description" class="on-auth-hide">Valid Key: a87b472b</p>
+						<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
+					</div>
+				</div>
+			
+				<div id="actions-group" class="actions-wrapper toolbar-actions">
+					<div id="merged-left">
+						<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
+					</div>
+					<div id="merged-right">
+						<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
+					</div>
+					<div>
+						<button id="clearButton">Clear</button>
+					</div>
+				</div>
+			</div>
+			`		
+			document.querySelector('#toolbar').style.justifyContent = 'space-between'
+			document.querySelector('#toolbar').style.backgroundColor = '#f8f3dd'
+			document.querySelector('#toolbar').style.borderBottom = '1px solid #dad9cf'
+			document.querySelector('#toolbar').style.borderTop = '1px solid #dad9cf'
+			
+			VIEW.setDatePicker()
+
+			document.querySelector('#connection-status').addEventListener('mouseover', () => {
+				document.querySelector('#connection-status-description').style.display = 'flex'
+				console.log('hover event')
+			})
+			document.querySelector('#connection-status').addEventListener('mouseout', () => {
+				document.querySelector('#connection-status-description').style.display = 'none'
+			})
 		} else {
-			DRAW.setStatusIcon("nokey")
-			document.querySelector('#api-key').value = DATA.key
+			document.querySelector('#toolbar').innerHTML = `
+			<form class="auth">
+				<label for="auth-key">&nbsp Key</label>
+				<input class="input" type="text" id="api-key" name="api-key" placeholder="Enter Security Key to Connect"/>
+				<div id="auth-button">
+					<button>Enroll</button>
+				</div>
+			</form>
+			`
+			document.querySelector('.error-hint').style.display = 'flex';
 			document.querySelector('#api-key').focus()
 			
-			document.querySelector('#enroll-submit').addEventListener('click', () => {
+			document.querySelector('#auth-button').addEventListener('click', () => {
 				DATA.bakeCookies(document.querySelector('#api-key').value)
 				APP.getData()
 			})
 		}
-		
 	},
 	table: function(data) {
 		document.querySelector('#js-enabled').innerHTML = data[1].fields.name
 	}
 }
+
+
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // ## DATA
@@ -89,6 +138,10 @@ const DATA = {
 	dataObj: [],
 	cookies: document.cookie,
 	isConnected: false,
+	
+	airtableURL: '',
+	airtableTables: [],
+	
 	freshCookies: function () {
 		DATA.cookies = document.cookie
 		return DATA.cookies
@@ -134,7 +187,8 @@ const DATA = {
 		}
 	},
 	loadJSON: function (table) {
-		const reqURL = `https://api.airtable.com/v0/app9sUZzisuGNjntz/${encodeURI(table)}`
+		const reqURL = `${DATA.airtableURL}${encodeURI(table)}`
+		console.log("Trying at URL " + reqURL)
 		const reqPromise = fetch(reqURL, {
 			method: "GET",
 			withCredentials: true,
@@ -145,7 +199,8 @@ const DATA = {
 		reqPromise
 			.then(response => {
 				if (response.status == 401) {
-					DRAW.showAuth()
+					DATA.connectionStatus = "badkey"
+					VIEW.showAuth()
 					throw Error("Authentication Error")
 				} else if (response.status == 404) {
 					throw Error("Data record can't be found")
@@ -153,14 +208,14 @@ const DATA = {
 					throw Error("Something went wrong" + response.status + " - " + response.statusText)
 				}
 				DATA.isConnected = true
-				DRAW.setStatusIcon("connected")
+				VIEW.updateStatusIcon("connected")
 				console.log("Data retrieved successfully")
 				return response.json()
 			})
 			.then(resData => {
 				DATA.dataObj = resData.records
 				console.log(DATA.dataObj)
-				DRAW.table(resData.records)
+				VIEW.table(resData.records)
 			})
 			.catch(err => {
 				console.log(err)
@@ -168,17 +223,20 @@ const DATA = {
 	}
 }
 
-class ITEM {
-	constructor(name, cost, unit) {
-		this.name = name
-		this.cost = cost
-		this.unit = unit
-	}
-}
-
-let newItem = new ITEM("a name", 0.85, "whole")
-console.log(newItem)
 
 
 
-APP.init()
+APP.init(airtableURL, airtableTables)
+
+
+
+// class ITEM {
+// 	constructor(name, cost, unit) {
+// 		this.name = name
+// 		this.cost = cost
+// 		this.unit = unit
+// 	}
+// }
+// 
+// let newItem = new ITEM("a name", 0.85, "whole")
+// console.log(newItem)
