@@ -18,14 +18,12 @@ const airtableTables = ['Materials', 'Labor'] //airtableTables - array of the ta
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const APP = {
 	init: function (url, tables) {
+		VIEW.removeJSDisabledMessage()
+		
 		// Set some things up initially
 		DATA.airtableURL = url
 		DATA.airtableTables = tables
 		
-		VIEW.removeJSDisabledMessage()
-		
-		// Draw Toolbar
-		VIEW.setToolbar()
 		// Start by getting the data from AirTable
 		APP.getData()
 		
@@ -33,10 +31,8 @@ const APP = {
 	getData: function () {
 		if ( DATA.isKeyValid() ) {
 			DATA.loadJSON(DATA.airtableTables[0])
-			VIEW.setToolbar()
-		} else {
-			VIEW.setToolbar()
-		}
+		} 
+		VIEW.setToolbar()
 	}
 }
 
@@ -58,66 +54,82 @@ const VIEW = {
 	},
 	setToolbar: function () {
 		if (DATA.connectionStatus == 'connected') {
-			document.querySelector('#toolbar').innerHTML = `
-			<form class="form-wrapper toolbar-actions">
-				<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
-				<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
-				<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
-			</form>
+			VIEW.setToolbarActive()
+		} else {
+			VIEW.setToolbarAuth()
+		}
+	},
+	authFirstTry: true,
+	setToolbarAuth: function () {
+		if (VIEW.authFirstTry) {
+			document.querySelector('.error-hint').style.display = 'none'
+			VIEW.authFirstTry = false
+		} else {
+			document.querySelector('.error-hint').style.display = 'flex';
+			document.querySelector('#error-hint-text').innerHTML = DATA.connectionStatus;
 			
-			<div id="toolbar-functions" class="toolbar-actions">
-				<div id="connection-status" class="toolbar-actions">
-					<div id="connection-status-button">
-						<p id="connection-status-description" class="on-auth-hide">Valid Key: a87b472b</p>
-						<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
-					</div>
-				</div>
-			
-				<div id="actions-group" class="actions-wrapper toolbar-actions">
-					<div id="merged-left">
-						<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
-					</div>
-					<div id="merged-right">
-						<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
-					</div>
-					<div>
-						<button id="clearButton">Clear</button>
-					</div>
+		}
+		document.querySelector('#toolbar').innerHTML = `
+		<form class="auth">
+			<label for="auth-key">&nbsp Key</label>
+			<input class="input" type="text" id="api-key" name="api-key" placeholder="Enter Security Key to Connect"/>
+			<div id="auth-button">
+				<button>Enroll</button>
+			</div>
+		</form>
+		`
+		document.querySelector('#api-key').value = DATA.key
+		document.querySelector('#api-key').focus()
+		
+		document.querySelector('#auth-button').addEventListener('click', () => {
+			DATA.bakeCookies(document.querySelector('#api-key').value)
+			APP.getData()
+		})
+	},
+	setToolbarActive: function () {
+		document.querySelector('#toolbar').innerHTML = `
+		<form class="form-wrapper toolbar-actions">
+			<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
+			<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
+			<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
+		</form>
+		
+		<div id="toolbar-functions" class="toolbar-actions">
+			<div id="connection-status" class="toolbar-actions">
+				<div id="connection-status-button">
+					<p id="connection-status-description" class="on-auth-hide">Valid Key: ${DATA.key}</p>
+					<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
 				</div>
 			</div>
-			`		
-			document.querySelector('#toolbar').style.justifyContent = 'space-between'
-			document.querySelector('#toolbar').style.backgroundColor = '#f8f3dd'
-			document.querySelector('#toolbar').style.borderBottom = '1px solid #dad9cf'
-			document.querySelector('#toolbar').style.borderTop = '1px solid #dad9cf'
-			
-			VIEW.setDatePicker()
-
-			document.querySelector('#connection-status').addEventListener('mouseover', () => {
-				document.querySelector('#connection-status-description').style.display = 'flex'
-				console.log('hover event')
-			})
-			document.querySelector('#connection-status').addEventListener('mouseout', () => {
-				document.querySelector('#connection-status-description').style.display = 'none'
-			})
-		} else {
-			document.querySelector('#toolbar').innerHTML = `
-			<form class="auth">
-				<label for="auth-key">&nbsp Key</label>
-				<input class="input" type="text" id="api-key" name="api-key" placeholder="Enter Security Key to Connect"/>
-				<div id="auth-button">
-					<button>Enroll</button>
+		
+			<div id="actions-group" class="actions-wrapper toolbar-actions">
+				<div id="merged-left">
+					<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
 				</div>
-			</form>
-			`
-			document.querySelector('.error-hint').style.display = 'flex';
-			document.querySelector('#api-key').focus()
-			
-			document.querySelector('#auth-button').addEventListener('click', () => {
-				DATA.bakeCookies(document.querySelector('#api-key').value)
-				APP.getData()
-			})
-		}
+				<div id="merged-right">
+					<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
+				</div>
+				<div>
+					<button id="clearButton">Clear</button>
+				</div>
+			</div>
+		</div>
+		`		
+		document.querySelector('#toolbar').style.justifyContent = 'space-between'
+		document.querySelector('#toolbar').style.backgroundColor = '#f8f3dd'
+		document.querySelector('#toolbar').style.borderBottom = '1px solid #dad9cf'
+		document.querySelector('#toolbar').style.borderTop = '1px solid #dad9cf'
+		document.querySelector('.error-hint').style.display = 'none'
+		
+		VIEW.setDatePicker()
+
+		document.querySelector('#connection-status').addEventListener('mouseover', () => {
+			document.querySelector('#connection-status-description').style.display = 'flex'
+			console.log('hover event')
+		})
+		document.querySelector('#connection-status').addEventListener('mouseout', () => {
+			document.querySelector('#connection-status-description').style.display = 'none'
+		})
 	},
 	table: function(data) {
 		document.querySelector('#js-enabled').innerHTML = data[1].fields.name
@@ -162,22 +174,21 @@ const DATA = {
 	},
 	isKeyValid: function () {
 		DATA.freshCookies()
-		if (typeof DATA.cookies == 'undefined' || DATA.cookies == "") {
+		if (typeof DATA.cookies == 'undefined' || DATA.cookies == "" || !DATA.cookies.includes(DATA.keyName)) {
+			DATA.connectionStatus = 'Key is Required'
 			console.log("API Key Doesn't Exist - There Are No Cookies")
-			return false
-		}
-		if (!DATA.cookies.includes(DATA.keyName)) {
-			console.log("API Key Doesn't Exist")
 			return false
 		}
 		
 		DATA.loadKey()
 		
 		if (DATA.key == "" || DATA.key == "null") {
+			DATA.connectionStatus = 'Key is Required'
 			console.log("API Key is Empty")
 			return false
 		}
 		if (DATA.key.length < 10) {
+			DATA.connectionStatus = 'Invalid Key'
 			console.log("API Key is Too Short")
 			return false
 		}
@@ -199,16 +210,18 @@ const DATA = {
 		reqPromise
 			.then(response => {
 				if (response.status == 401) {
-					DATA.connectionStatus = "badkey"
-					VIEW.showAuth()
+					DATA.connectionStatus = 'Invalid Key'
 					throw Error("Authentication Error")
 				} else if (response.status == 404) {
+					DATA.connectionStatus = 'Connection to Server Failed'
 					throw Error("Data record can't be found")
 				} else if (!response.ok) {
+					DATA.connectionStatus = 'Something Went Wrong'
 					throw Error("Something went wrong" + response.status + " - " + response.statusText)
 				}
+				DATA.connectionStatus = 'connected'
+				VIEW.setToolbar()
 				DATA.isConnected = true
-				VIEW.updateStatusIcon("connected")
 				console.log("Data retrieved successfully")
 				return response.json()
 			})
