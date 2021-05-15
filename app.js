@@ -6,10 +6,9 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // * * Set Variables * * * * * * * * * * * * * * * * * * * *
 const airtableURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' //the URL of the airtable project
-const airtableTables = ['Materials', 'Labor'] //airtableTables - array of the table's names you want to load
+const materialsAT = 'Materials'
+const laborAT = 'Labor'
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -17,23 +16,60 @@ const airtableTables = ['Materials', 'Labor'] //airtableTables - array of the ta
 // Responsible for main controlling of the page
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const APP = {
-	init: function (url, tables) {
+	init: function (url) {
 		VIEW.removeJSDisabledMessage()
-		
-		// Set some things up initially
-		DATA.airtableURL = url
-		DATA.airtableTables = tables
-		
-		// Start by getting the data from AirTable
-		APP.getData()
-		
+		APP.goGetData()
 	},
-	getData: function () {
+	goGetData: function () {
 		if ( DATA.isKeyValid() ) {
-			DATA.loadJSON(DATA.airtableTables[0])
+			APP.getData(DATA.materials)
+			APP.getData(DATA.labor)
 		} else {
 			VIEW.updateToolbar()
 		}
+	},
+	// tries to get data for data object passed to it
+	// on success, updates toolbar and then proceeds to APP.useData
+	// on fail, updates the toolbar
+	getData: function (dataObj) {
+		const reqURL = `${airtableURL}${encodeURI(dataObj.AT)}`
+		console.log("Trying to get " + dataObj.name + " at URL " + reqURL)
+		const reqPromise = fetch(reqURL, {
+			method: "GET",
+			withCredentials: true,
+			headers: {
+				"Authorization": `Bearer ${DATA.key}`
+			}
+		})	
+		reqPromise
+			.then(response => {
+				if (response.status == 401) {
+					DATA.connectionStatus = 'Invalid Key'
+					throw Error("Authentication Error")
+				} else if (response.status == 404) {
+					DATA.connectionStatus = 'Connection to Server Failed'
+					throw Error("Record Not Found")
+				} else if (!response.ok) {
+					DATA.connectionStatus = 'Something Went Wrong'
+					throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
+				} else {
+					DATA.connectionStatus = 'connected'
+					VIEW.updateToolbar()
+					return response.json()
+				}
+			})
+			.then(responseData => {
+				dataObj.json = responseData.records
+				APP.useData(responseData.records, dataObj)
+			})
+			.catch(err => {
+				VIEW.updateToolbar()
+				console.log(err)
+			})
+	},
+	useData: function (data, dataObj) {
+		console.log(dataObj.name + " Data Retrieved Successfully:")
+		VIEW.table(dataObj.json)
 	}
 }
 
@@ -84,7 +120,7 @@ const VIEW = {
 		
 		document.querySelector('#auth-button').addEventListener('click', () => {
 			DATA.bakeCookies(document.querySelector('#api-key').value)
-			APP.getData()
+			APP.goGetData()
 		})
 	},
 	setToolbarActive: function () {
@@ -96,9 +132,9 @@ const VIEW = {
 		</form>
 		
 		<div id="toolbar-functions" class="toolbar-actions">
-			<div id="connection-status" class="toolbar-actions">
+			<div id="connection-status" class="status-wrapper toolbar-actions">
 				<div id="connection-status-button">
-					<p id="connection-status-description" class="on-auth-hide">Valid Key: ${DATA.key}</p>
+					<p id="connection-status-description" class="on-auth-hide">Valid Key:&nbsp<span id="shown-key">${DATA.key}</span></p>
 					<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
 				</div>
 			</div>
@@ -123,7 +159,7 @@ const VIEW = {
 		document.querySelector('.error-hint').style.display = 'none'
 		
 		VIEW.setDatePicker()
-
+		
 		document.querySelector('#connection-status').addEventListener('mouseover', () => {
 			document.querySelector('#connection-status-description').style.display = 'flex'
 			console.log('hover event')
@@ -133,7 +169,7 @@ const VIEW = {
 		})
 	},
 	table: function(data) {
-		document.querySelector('#js-enabled').innerHTML = data[1].fields.name
+		console.log(data)
 	}
 }
 
@@ -148,11 +184,19 @@ const DATA = {
 	connectionStatus: "",
 	keyName: "apiKey",
 	key: '',
-	dataObj: [],
-	cookies: document.cookie,	
-	airtableURL: '',
-	airtableTables: [],
 	
+	materials: {
+		name: 'materials',
+		AT: materialsAT,
+		json: []
+		},
+	labor: {
+		name: 'labor',
+		AT: laborAT,
+		json: []
+		},
+	
+	cookies: document.cookie,	
 	freshCookies: function () {
 		DATA.cookies = document.cookie
 		return DATA.cookies
@@ -195,50 +239,13 @@ const DATA = {
 			console.log("API Key '" + DATA.key + "' appears valid. Will try to connect...")
 			return true
 		}
-	},
-	loadJSON: function (table) {
-		const reqURL = `${DATA.airtableURL}${encodeURI(table)}`
-		console.log("Trying at URL " + reqURL)
-		const reqPromise = fetch(reqURL, {
-			method: "GET",
-			withCredentials: true,
-			headers: {
-				"Authorization": `Bearer ${DATA.key}`
-			}
-		})	
-		reqPromise
-			.then(response => {
-				if (response.status == 401) {
-					DATA.connectionStatus = 'Invalid Key'
-					throw Error("Authentication Error")
-				} else if (response.status == 404) {
-					DATA.connectionStatus = 'Connection to Server Failed'
-					throw Error("Data record can't be found")
-				} else if (!response.ok) {
-					DATA.connectionStatus = 'Something Went Wrong'
-					throw Error("Something went wrong" + response.status + " - " + response.statusText)
-				}
-				DATA.connectionStatus = 'connected'
-				VIEW.updateToolbar()
-				console.log("Data retrieved successfully")
-				return response.json()
-			})
-			.then(resData => {
-				DATA.dataObj = resData.records
-				console.log(DATA.dataObj)
-				VIEW.table(resData.records)
-			})
-			.catch(err => {
-				VIEW.updateToolbar()
-				console.log(err)
-			})
 	}
 }
 
 
 
 
-APP.init(airtableURL, airtableTables)
+APP.init()
 
 
 
