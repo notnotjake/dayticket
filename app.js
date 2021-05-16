@@ -108,21 +108,36 @@ const APP = {
 const DRAW = {
 	table: function(dataObj) {
 		if (dataObj.name == 'materials') {
-			let htmlColumn1Render = ''
-			let htmlColumn2Render = ''
+			let htmlContent = ''
+			
 			DATA.materials.sections.forEach( (i) => {
-				let htmlSectionRender = ``
-				htmlSectionRender += `<h2>${i[0]}</h2>`
+				let htmlSectionContent = ``
+				
+				htmlSectionContent += `
+					<table class='materials-table'>
+						<tr><td colspan='2' class='table-header'>${i[0]}</td></tr>
+					`
 				
 				DATA.materials.data.forEach( (x) => {
 					if (x.section == i[0]) {
-						htmlSectionRender += `<p>${x.name} ${x.cost}</p>`
+						let placeholder = () => { if (x.unit != 'whole') { return x.unit } else { return ''} }
+						htmlSectionContent += `
+						<tr class='table-rows'>
+							<td class='qty'><input type='number' min='1' id='qtyOf-${x.id}' placeholder='${placeholder()}'></td>
+							<td class='item-name'><label for='qtyOf-${x.id}'>${x.name}</label></td>
+						</tr>
+						`
 					}
 				})
 				
-				htmlColumn1Render += htmlSectionRender
+				htmlSectionContent += `</table>`
+				
+				htmlContent += htmlSectionContent
+				
+				
 			})
-			document.querySelector(`#column-1`).innerHTML = htmlColumn1Render
+			
+			document.querySelector(`#column-1`).innerHTML = htmlContent
 
 		} else if (dataObj.name == 'labor') {
 			htmlRender = ''
