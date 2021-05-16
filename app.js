@@ -1,38 +1,100 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // * * Overview  * * * * * * * * * * * * * * * * * * * * * * 
 // APP - handles the flow of the page
-// VIEW - handles changes that the user sees
+// DRAW - handles changes that the user sees
 // DATA - handles anything related to airtable, cookies, and data
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // * * Set Variables * * * * * * * * * * * * * * * * * * * *
 const airtableURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' //the URL of the airtable project
-const airtableTables = ['Materials', 'Labor'] //airtableTables - array of the table's names you want to load
+const materialsAT = 'Materials'
+const materialsSections = [ ['Prewire & Cable', 1], ['Cable Ends & Jacks', 1], ['Faceplate & Trimout', 2], ['Sound, AV, & Automation', 2], ['Alarm/Security', 2], ['Central Vac', 2] ]
+const laborAT = 'Labor'
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-
+// ## Define an 'Item' for Materials data object
+class ITEM {
+	constructor(name, cost, unit, id, section, qty) {
+		this.name = name
+		this.cost = cost
+		this.unit = unit
+		this.id = id
+		this.section = section
+		this.qty = qty
+	}
+}
+// ## Define a 'Laborer' for Labor data object
+class RATE {
+	constructor(name, regWage, otWage, id, hours) {
+		this.name = name
+		this.regWage = regWage
+		this.otWage = otWage
+		this.id = id
+		this.hours = hours
+	}
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // ## APP
 // Responsible for main controlling of the page
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const APP = {
-	init: function (url, tables) {
-		VIEW.removeJSDisabledMessage()
-		
-		// Set some things up initially
-		DATA.airtableURL = url
-		DATA.airtableTables = tables
-		
-		// Start by getting the data from AirTable
-		APP.getData()
-		
+	init: function (url) {
+		DRAW.removeJSDisabledMessage()
+		APP.goGetData()
 	},
-	getData: function () {
+	goGetData: function () {
 		if ( DATA.isKeyValid() ) {
-			DATA.loadJSON(DATA.airtableTables[0])
-		} 
-		VIEW.setToolbar()
+			APP.getData(DATA.materials)
+			APP.getData(DATA.labor)
+		} else {
+			DRAW.updateToolbar()
+		}
+	},
+	
+	// tries to get data for data object passed to it
+	// on success, updates toolbar and then proceeds to APP.useData
+	// on fail, updates the toolbar
+	getData: function (dataObj) {
+		const reqURL = `${airtableURL}${encodeURI(dataObj.AT)}`
+		console.log("Trying to get " + dataObj.name + " at URL " + reqURL)
+		const reqPromise = fetch(reqURL, {
+			method: "GET",
+			withCredentials: true,
+			headers: {
+				"Authorization": `Bearer ${DATA.key}`
+			}
+		})	
+		reqPromise
+			.then(response => {
+				if (response.status == 401) {
+					DATA.connectionStatus = 'Invalid Key'
+					throw Error("Authentication Error")
+				} else if (response.status == 404) {
+					DATA.connectionStatus = 'Connection to Server Failed'
+					throw Error("Record Not Found")
+				} else if (!response.ok) {
+					DATA.connectionStatus = 'Something Went Wrong'
+					throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
+				} else {
+					DATA.connectionStatus = 'connected'
+					DRAW.updateToolbar()
+					return response.json()
+				}
+			})
+			.then(responseData => {
+				dataObj.data = responseData.records
+				APP.useData(responseData.records, dataObj)
+			})
+			.catch(err => {
+				DRAW.updateToolbar()
+				console.log(err)
+			})
+	},
+	useData: function (data, dataObj) {
+		console.log(dataObj.name + " Data Retrieved Successfully:")
+		dataObj.parseData()
+		console.log(dataObj.data)
+		DRAW.table(dataObj)
 	}
 }
 
@@ -40,10 +102,39 @@ const APP = {
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// ## VIEW
+// ## DRAW
 // Responsible for changing things on screen
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const VIEW = {
+const DRAW = {
+	table: function(dataObj) {
+		if (dataObj.name == 'materials') {
+			let htmlColumn1Render = ''
+			let htmlColumn2Render = ''
+			DATA.materials.sections.forEach( (i) => {
+				let htmlSectionRender = ``
+				htmlSectionRender += `<h2>${i[0]}</h2>`
+				
+				DATA.materials.data.forEach( (x) => {
+					if (x.section == i[0]) {
+						htmlSectionRender += `<p>${x.name} ${x.cost}</p>`
+					}
+				})
+				
+				htmlColumn1Render += htmlSectionRender
+			})
+			document.querySelector(`#column-1`).innerHTML = htmlColumn1Render
+
+		} else if (dataObj.name == 'labor') {
+			htmlRender = ''
+			DATA.labor.data.forEach( (i) => {
+				htmlRender += `
+					<p>${i.name} ${i.regWage}</p>
+				`
+			})
+			document.querySelector('#column-3').innerHTML = htmlRender
+		}
+	},
+	
 	setDatePicker: function () {
 		var dateField = document.querySelector('#date')
 		var date = new Date()
@@ -52,18 +143,19 @@ const VIEW = {
 	removeJSDisabledMessage: function () {
 		document.querySelector('#js-enabled').style.display = 'none'
 	},
-	setToolbar: function () {
+	updateToolbar: function () {
 		if (DATA.connectionStatus == 'connected') {
-			VIEW.setToolbarActive()
+			DRAW.setToolbarActive()
 		} else {
-			VIEW.setToolbarAuth()
+			DRAW.setToolbarAuth()
 		}
 	},
+	
 	authFirstTry: true,
 	setToolbarAuth: function () {
-		if (VIEW.authFirstTry) {
+		if (DRAW.authFirstTry) {
 			document.querySelector('.error-hint').style.display = 'none'
-			VIEW.authFirstTry = false
+			DRAW.authFirstTry = false
 		} else {
 			document.querySelector('.error-hint').style.display = 'flex';
 			document.querySelector('#error-hint-text').innerHTML = DATA.connectionStatus;
@@ -83,7 +175,7 @@ const VIEW = {
 		
 		document.querySelector('#auth-button').addEventListener('click', () => {
 			DATA.bakeCookies(document.querySelector('#api-key').value)
-			APP.getData()
+			APP.goGetData()
 		})
 	},
 	setToolbarActive: function () {
@@ -95,9 +187,9 @@ const VIEW = {
 		</form>
 		
 		<div id="toolbar-functions" class="toolbar-actions">
-			<div id="connection-status" class="toolbar-actions">
+			<div id="connection-status" class="status-wrapper toolbar-actions">
 				<div id="connection-status-button">
-					<p id="connection-status-description" class="on-auth-hide">Valid Key: ${DATA.key}</p>
+					<p id="connection-status-description" class="on-auth-hide">Valid Key:&nbsp<span id="shown-key">${DATA.key}</span></p>
 					<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
 				</div>
 			</div>
@@ -121,8 +213,8 @@ const VIEW = {
 		document.querySelector('#toolbar').style.borderTop = '1px solid #dad9cf'
 		document.querySelector('.error-hint').style.display = 'none'
 		
-		VIEW.setDatePicker()
-
+		DRAW.setDatePicker()
+		
 		document.querySelector('#connection-status').addEventListener('mouseover', () => {
 			document.querySelector('#connection-status-description').style.display = 'flex'
 			console.log('hover event')
@@ -130,9 +222,6 @@ const VIEW = {
 		document.querySelector('#connection-status').addEventListener('mouseout', () => {
 			document.querySelector('#connection-status-description').style.display = 'none'
 		})
-	},
-	table: function(data) {
-		document.querySelector('#js-enabled').innerHTML = data[1].fields.name
 	}
 }
 
@@ -144,16 +233,57 @@ const VIEW = {
 // Responsible for taking care of the data and connecting with AirTable
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const DATA = {
+	materials: {
+		name: 'materials',
+		AT: materialsAT,
+		data: [],
+		sections: materialsSections,
+		parseData: function () {
+			let dataReturned = []
+			DATA.materials.data.forEach((i) => {
+				// ITEM arguments: name, cost, unit, id, section, qty
+				let iRecord = new ITEM(i.fields.name, i.fields.cost, i.fields.unit, i.id, i.fields.section, null)
+				dataReturned.push(iRecord)
+			})
+			DATA.materials.data = dataReturned
+			
+			return DATA.materials.data
+		},
+		// not used, opting to manually enter
+		getSections: function () {
+			DATA.materials.data.forEach( (i) => {
+				DATA.materials.sections.push(i.section)
+			})			
+			
+			let unique = []
+			unique = DATA.materials.sections.filter((value, index, self) => {
+				return self.indexOf(value) === index
+			})
+			DATA.materials.sections = unique
+		}
+	},
+	labor: {
+		name: 'labor',
+		AT: laborAT,
+		data: [],
+		parseData: function () {
+			let dataReturned = []
+			DATA.labor.data.forEach((i) => {
+				// RATE arguments: name, regWage, otWage, id, hours
+				let iRecord = new RATE(i.fields.name, i.fields.regular, i.fields.overtime)
+				dataReturned.push(iRecord)
+			})
+			DATA.labor.data = dataReturned
+			
+			return DATA.labor.data
+		}
+	},
+	
 	connectionStatus: "",
 	keyName: "apiKey",
 	key: '',
-	dataObj: [],
-	cookies: document.cookie,
-	isConnected: false,
 	
-	airtableURL: '',
-	airtableTables: [],
-	
+	cookies: document.cookie,	
 	freshCookies: function () {
 		DATA.cookies = document.cookie
 		return DATA.cookies
@@ -196,61 +326,10 @@ const DATA = {
 			console.log("API Key '" + DATA.key + "' appears valid. Will try to connect...")
 			return true
 		}
-	},
-	loadJSON: function (table) {
-		const reqURL = `${DATA.airtableURL}${encodeURI(table)}`
-		console.log("Trying at URL " + reqURL)
-		const reqPromise = fetch(reqURL, {
-			method: "GET",
-			withCredentials: true,
-			headers: {
-				"Authorization": `Bearer ${DATA.key}`
-			}
-		})	
-		reqPromise
-			.then(response => {
-				if (response.status == 401) {
-					DATA.connectionStatus = 'Invalid Key'
-					throw Error("Authentication Error")
-				} else if (response.status == 404) {
-					DATA.connectionStatus = 'Connection to Server Failed'
-					throw Error("Data record can't be found")
-				} else if (!response.ok) {
-					DATA.connectionStatus = 'Something Went Wrong'
-					throw Error("Something went wrong" + response.status + " - " + response.statusText)
-				}
-				DATA.connectionStatus = 'connected'
-				VIEW.setToolbar()
-				DATA.isConnected = true
-				console.log("Data retrieved successfully")
-				return response.json()
-			})
-			.then(resData => {
-				DATA.dataObj = resData.records
-				console.log(DATA.dataObj)
-				VIEW.table(resData.records)
-			})
-			.catch(err => {
-				VIEW.setToolbar()
-				console.log(err)
-			})
 	}
 }
 
 
 
 
-APP.init(airtableURL, airtableTables)
-
-
-
-// class ITEM {
-// 	constructor(name, cost, unit) {
-// 		this.name = name
-// 		this.cost = cost
-// 		this.unit = unit
-// 	}
-// }
-// 
-// let newItem = new ITEM("a name", 0.85, "whole")
-// console.log(newItem)
+APP.init()

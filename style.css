@@ -136,7 +136,12 @@ button {
 
 
 
-
+.status-wrapper > div {
+	height: 32px;
+	display: flex;
+	margin-left: 12px;
+	border-radius: 5px;
+}
 #connection-status {
 	display: flex;
 	justify-content: flex-end;
@@ -158,8 +163,8 @@ button {
 	border-radius: 5px;
 	padding: 0 5px;
 }
-#connection-status:hover {
-	cursor: pointer;
+.status-wrapper:hover > div {
+	//cursor: text;
 	background-color: #D1F6D1;
 }
 #connection-status-icon > i {
@@ -167,7 +172,12 @@ button {
 	color: #19b851;
 }
 #connection-status-description {
+	padding-left: 5px;
+	font-weight: 400;
 	display: none;
+}
+#shown-key {
+	font-weight: 500;
 }
 
 
@@ -221,6 +231,74 @@ button {
 	align-content: center;
 	align-self: center;
 	color: #f59706;
+}
+
+.content-wrapper {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 30px;
+}
+.content-wrapper > div {
+	width: calc(33.33% - 8px);
+}
+
+footer {
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	width: 470px;
+	padding: 10px 0;
+	border-radius: 7px;
+	background-color: #f1ede0; 
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 170px;
+	margin-bottom: 170px;
+}
+footer p {
+	margin-top: 0;
+	margin-bottom: 20px;
+	color: #304e74;
+}
+footer h1 {
+	font-size: 21px;
+}
+footer p > a {
+	font-size: 14px;
+	font-weight: 500;
+	word-spacing: 4px;
+	padding: 8px 10px;
+	border-radius: 6px;
+	text-decoration: none;
+	color: #304e74;
+}
+#footer-space {
+	word-spacing: 14px;
+}
+footer p > a:hover {
+	background-color: #d5d1c3;
+	color: #2a6bbc;
+}
+
+#snowman-footer-light {
+	display: flex;
+	align-items: center;
+	align-self: center;
+	border-top: 1px solid #D9CEC3;
+	padding-top: 5px;
+	margin-top: 14px;
+}
+#snowman-footer-light img {
+	width: 30px;
+}
+#snowman-footer-light h2 {
+	font-size: 15px;
+	font-weight: 600;
+	margin-left: 8px;
+	color: #827B6D;
+}
+#snowman-footer-light a:hover h2 {
+	color: #646058;
 }
 
 
