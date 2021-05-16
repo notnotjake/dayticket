@@ -8,9 +8,11 @@ html, button, input, select, textarea {
 		font-family: 'Inter var', sans-serif;
 	}
 }
+html {
+	background-color: #fbf9f1;
+}
 
 body {
-	background-color: #fbf9f1;
 	display: flex;
 	justify-content: center;
 	width: auto;
@@ -239,8 +241,93 @@ button {
 	margin-top: 30px;
 }
 .content-wrapper > div {
-	width: calc(33.33% - 8px);
+	width: calc(25% - 8px);
 }
+
+
+
+
+
+
+
+
+table {
+	background-color: #e8e7df;
+	font-size: 14px;
+	margin-bottom: 15px;
+	width: 100%;
+}
+
+table, th, td {
+	border-bottom: 1px solid #cccccc;
+	border-collapse: collapse;
+	padding: 5px 5px;
+}
+td.item-name {
+	padding: 5px 0;
+}
+td.qty {
+	width: 50px;
+	padding: 0;
+	background-color: #f0efeb;
+	height: 10pt;
+	text-align: right;
+	vertical-align: top;
+}
+
+td.qty input::placeholder {
+	color: #8e8e8b;
+}
+td.qty input:focus::placeholder {
+	color: #dfdfdf;
+}
+
+
+.materials-table .table-rows tr:first-child td {
+	background-color: red;
+}
+
+td.qty input {
+	width: 46px;
+	font-size: 14px;
+	padding: 5px 5px;
+	background-color: transparent;
+	border: none;
+	text-align: right;
+}
+/* Chrome, Safari, Edge, Opera */
+td.qty input::-webkit-outer-spin-button,
+td.qty input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+td.qty input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+.materials-table label {
+	padding-left: 5px;
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+}
+.table-header {
+	font-weight: 500;
+	border-bottom: 1px solid #b7b7b7;
+	background-color: #dbe3e6;
+}
+
+
+
+
+
+
+
+
+
 
 footer {
 	display: flex;
