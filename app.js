@@ -1,15 +1,37 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // * * Overview  * * * * * * * * * * * * * * * * * * * * * * 
 // APP - handles the flow of the page
-// VIEW - handles changes that the user sees
+// DRAW - handles changes that the user sees
 // DATA - handles anything related to airtable, cookies, and data
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // * * Set Variables * * * * * * * * * * * * * * * * * * * *
 const airtableURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' //the URL of the airtable project
 const materialsAT = 'Materials'
+const materialsSections = [ ['Prewire & Cable', 1], ['Cable Ends & Jacks', 1], ['Faceplate & Trimout', 2], ['Sound, AV, & Automation', 2], ['Alarm/Security', 2], ['Central Vac', 2] ]
 const laborAT = 'Labor'
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+// ## Define an 'Item' for Materials data object
+class ITEM {
+	constructor(name, cost, unit, id, section, qty) {
+		this.name = name
+		this.cost = cost
+		this.unit = unit
+		this.id = id
+		this.section = section
+		this.qty = qty
+	}
+}
+// ## Define a 'Laborer' for Labor data object
+class RATE {
+	constructor(name, regWage, otWage, id, hours) {
+		this.name = name
+		this.regWage = regWage
+		this.otWage = otWage
+		this.id = id
+		this.hours = hours
+	}
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // ## APP
@@ -17,7 +39,7 @@ const laborAT = 'Labor'
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const APP = {
 	init: function (url) {
-		VIEW.removeJSDisabledMessage()
+		DRAW.removeJSDisabledMessage()
 		APP.goGetData()
 	},
 	goGetData: function () {
@@ -25,9 +47,10 @@ const APP = {
 			APP.getData(DATA.materials)
 			APP.getData(DATA.labor)
 		} else {
-			VIEW.updateToolbar()
+			DRAW.updateToolbar()
 		}
 	},
+	
 	// tries to get data for data object passed to it
 	// on success, updates toolbar and then proceeds to APP.useData
 	// on fail, updates the toolbar
@@ -54,22 +77,24 @@ const APP = {
 					throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
 				} else {
 					DATA.connectionStatus = 'connected'
-					VIEW.updateToolbar()
+					DRAW.updateToolbar()
 					return response.json()
 				}
 			})
 			.then(responseData => {
-				dataObj.json = responseData.records
+				dataObj.data = responseData.records
 				APP.useData(responseData.records, dataObj)
 			})
 			.catch(err => {
-				VIEW.updateToolbar()
+				DRAW.updateToolbar()
 				console.log(err)
 			})
 	},
 	useData: function (data, dataObj) {
 		console.log(dataObj.name + " Data Retrieved Successfully:")
-		VIEW.table(dataObj.json)
+		dataObj.parseData()
+		console.log(dataObj.data)
+		DRAW.table(dataObj)
 	}
 }
 
@@ -77,10 +102,39 @@ const APP = {
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// ## VIEW
+// ## DRAW
 // Responsible for changing things on screen
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const VIEW = {
+const DRAW = {
+	table: function(dataObj) {
+		if (dataObj.name == 'materials') {
+			let htmlColumn1Render = ''
+			let htmlColumn2Render = ''
+			DATA.materials.sections.forEach( (i) => {
+				let htmlSectionRender = ``
+				htmlSectionRender += `<h2>${i[0]}</h2>`
+				
+				DATA.materials.data.forEach( (x) => {
+					if (x.section == i[0]) {
+						htmlSectionRender += `<p>${x.name} ${x.cost}</p>`
+					}
+				})
+				
+				htmlColumn1Render += htmlSectionRender
+			})
+			document.querySelector(`#column-1`).innerHTML = htmlColumn1Render
+
+		} else if (dataObj.name == 'labor') {
+			htmlRender = ''
+			DATA.labor.data.forEach( (i) => {
+				htmlRender += `
+					<p>${i.name} ${i.regWage}</p>
+				`
+			})
+			document.querySelector('#column-3').innerHTML = htmlRender
+		}
+	},
+	
 	setDatePicker: function () {
 		var dateField = document.querySelector('#date')
 		var date = new Date()
@@ -91,16 +145,17 @@ const VIEW = {
 	},
 	updateToolbar: function () {
 		if (DATA.connectionStatus == 'connected') {
-			VIEW.setToolbarActive()
+			DRAW.setToolbarActive()
 		} else {
-			VIEW.setToolbarAuth()
+			DRAW.setToolbarAuth()
 		}
 	},
+	
 	authFirstTry: true,
 	setToolbarAuth: function () {
-		if (VIEW.authFirstTry) {
+		if (DRAW.authFirstTry) {
 			document.querySelector('.error-hint').style.display = 'none'
-			VIEW.authFirstTry = false
+			DRAW.authFirstTry = false
 		} else {
 			document.querySelector('.error-hint').style.display = 'flex';
 			document.querySelector('#error-hint-text').innerHTML = DATA.connectionStatus;
@@ -158,7 +213,7 @@ const VIEW = {
 		document.querySelector('#toolbar').style.borderTop = '1px solid #dad9cf'
 		document.querySelector('.error-hint').style.display = 'none'
 		
-		VIEW.setDatePicker()
+		DRAW.setDatePicker()
 		
 		document.querySelector('#connection-status').addEventListener('mouseover', () => {
 			document.querySelector('#connection-status-description').style.display = 'flex'
@@ -167,9 +222,6 @@ const VIEW = {
 		document.querySelector('#connection-status').addEventListener('mouseout', () => {
 			document.querySelector('#connection-status-description').style.display = 'none'
 		})
-	},
-	table: function(data) {
-		console.log(data)
 	}
 }
 
@@ -181,20 +233,55 @@ const VIEW = {
 // Responsible for taking care of the data and connecting with AirTable
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const DATA = {
-	connectionStatus: "",
-	keyName: "apiKey",
-	key: '',
-	
 	materials: {
 		name: 'materials',
 		AT: materialsAT,
-		json: []
+		data: [],
+		sections: materialsSections,
+		parseData: function () {
+			let dataReturned = []
+			DATA.materials.data.forEach((i) => {
+				// ITEM arguments: name, cost, unit, id, section, qty
+				let iRecord = new ITEM(i.fields.name, i.fields.cost, i.fields.unit, i.id, i.fields.section, null)
+				dataReturned.push(iRecord)
+			})
+			DATA.materials.data = dataReturned
+			
+			return DATA.materials.data
 		},
+		// not used, opting to manually enter
+		getSections: function () {
+			DATA.materials.data.forEach( (i) => {
+				DATA.materials.sections.push(i.section)
+			})			
+			
+			let unique = []
+			unique = DATA.materials.sections.filter((value, index, self) => {
+				return self.indexOf(value) === index
+			})
+			DATA.materials.sections = unique
+		}
+	},
 	labor: {
 		name: 'labor',
 		AT: laborAT,
-		json: []
-		},
+		data: [],
+		parseData: function () {
+			let dataReturned = []
+			DATA.labor.data.forEach((i) => {
+				// RATE arguments: name, regWage, otWage, id, hours
+				let iRecord = new RATE(i.fields.name, i.fields.regular, i.fields.overtime)
+				dataReturned.push(iRecord)
+			})
+			DATA.labor.data = dataReturned
+			
+			return DATA.labor.data
+		}
+	},
+	
+	connectionStatus: "",
+	keyName: "apiKey",
+	key: '',
 	
 	cookies: document.cookie,	
 	freshCookies: function () {
@@ -246,16 +333,3 @@ const DATA = {
 
 
 APP.init()
-
-
-
-// class ITEM {
-// 	constructor(name, cost, unit) {
-// 		this.name = name
-// 		this.cost = cost
-// 		this.unit = unit
-// 	}
-// }
-// 
-// let newItem = new ITEM("a name", 0.85, "whole")
-// console.log(newItem)
