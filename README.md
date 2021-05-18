@@ -10,7 +10,7 @@ Created by [Jake Gooch](https://www.notnotjake.com) for [Advance](https://www.ad
 
 👋 [User-facing About](https://dayticket.advanceas.com/about)
 
-❓ [User-facing Help](https://dayticket.advanceas.com/about)
+❓ [User-facing Help](https://dayticket.advanceas.com/help)
 
 
 ## 💡 Functionality
