@@ -8,22 +8,24 @@ html, button, input, select, textarea {
 		font-family: 'Inter var', sans-serif;
 	}
 }
-html {
-	background-color: #fbf9f1;
+
+:root {
+	--backgrount-color: #fbf9f1;
 }
 
-body {
-	display: flex;
-	justify-content: center;
-	width: auto;
-	height: auto;
+html {
+	background-color: var(--backgrount-color);
+}
+html * {
 	margin: 0;
 	padding: 0;
 }
+body {
+	display: flex;
+	justify-content: center;
+}
 #container {
 	width: 100%;
-	margin: 0 40px;
-	height: auto;
 	max-width: 1200px;
 }
 
@@ -45,16 +47,7 @@ body {
 	font-weight: 500;
 	font-size: 13px;
 }
-#toolbar > div {
-	height: 47px;
-	display: flex;
-	align-items: center;
-}
 
-.form-wrapper {
-	display: flex;
-	justify-content: start;
-}
 .form-wrapper input {
 	height: 32px;
 	padding: 0 6px;
@@ -70,13 +63,19 @@ body {
 #lot-block {
 	width: 100px;
 }
-
-#toolbar-functions {
-	display: flex;
-	justify-content: flex-end;
-	height: 47px;
-	align-items: center;
+#bill {
+	width: 100px;
+	text-align: right;
 }
+/* Chrome, Safari, Edge, Opera */
+.toolbar-actions > input[type:number]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+.toolbar-actions > input[type:number] {
+	-moz-appearance: textfield;
+}
+
 .toolbar-actions {
 	display: flex;
 }
@@ -87,7 +86,7 @@ body {
 	display: flex;
 }
 #toolbar-functions > div {
-	justify-content: flex-end;
+	//justify-content: flex-end;
 	height: 47px;
 	align-items: center;
 }
@@ -144,29 +143,11 @@ button {
 	margin-left: 12px;
 	border-radius: 5px;
 }
-#connection-status {
-	display: flex;
-	justify-content: flex-end;
-}
-#connection-status {
-	display: flex;
-	align-self: center;
-}
-#connection-status {
-	display: flex;
-	align-self: center;
-	align-items: center;
-}
 #connection-status-button {
-	display: flex;
 	align-items: center;
-	align-self: center;
-	height: 32px;
-	border-radius: 5px;
 	padding: 0 5px;
 }
 .status-wrapper:hover > div {
-	//cursor: text;
 	background-color: #D1F6D1;
 }
 #connection-status-icon > i {

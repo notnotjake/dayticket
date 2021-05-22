@@ -6,9 +6,9 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // * * Set Variables * * * * * * * * * * * * * * * * * * * *
 const airtableURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' //the URL of the airtable project
-const materialsAT = 'Materials'
-const materialsSections = [ ['Prewire & Cable', 1], ['Cable Ends & Jacks', 1], ['Faceplate & Trimout', 2], ['Sound, AV, & Automation', 2], ['Alarm/Security', 2], ['Central Vac', 2] ]
+const materialsAT = 'Materials?view=Sorted'
 const laborAT = 'Labor'
+const materialsSections = [ ['Prewire & Cable', 1], ['Cable Ends & Jacks', 1], ['Faceplate & Trimout', 2], ['Sound, AV, & Automation', 2], ['Alarm/Security', 3], ['Central Vac', 3] ]
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 // ## Define an 'Item' for Materials data object
@@ -110,10 +110,12 @@ const DRAW = {
 		if (dataObj.name == 'materials') {
 			let htmlContent = ''
 			
+			let column1 = ''
+			let column2 = ''
+			let column3 = ''
+			
 			DATA.materials.sections.forEach( (i) => {
-				let htmlSectionContent = ``
-				
-				htmlSectionContent += `
+				let sectionTable = `
 					<table class='materials-table'>
 						<tr><td colspan='2' class='table-header'>${i[0]}</td></tr>
 					`
@@ -121,7 +123,7 @@ const DRAW = {
 				DATA.materials.data.forEach( (x) => {
 					if (x.section == i[0]) {
 						let placeholder = () => { if (x.unit != 'whole') { return x.unit } else { return ''} }
-						htmlSectionContent += `
+						sectionTable += `
 						<tr class='table-rows'>
 							<td class='qty'><input type='number' min='1' id='qtyOf-${x.id}' placeholder='${placeholder()}'></td>
 							<td class='item-name'><label for='qtyOf-${x.id}'>${x.name}</label></td>
@@ -130,14 +132,21 @@ const DRAW = {
 					}
 				})
 				
-				htmlSectionContent += `</table>`
+				sectionTable += `</table>`
 				
-				htmlContent += htmlSectionContent
-				
+				if (i[1] == 1) {
+					column1 += sectionTable
+				} else if (i[1] == 2) {
+					column2 += sectionTable
+				} else if (i[1] == 3) {
+					column3 += sectionTable
+				}			
 				
 			})
 			
-			document.querySelector(`#column-1`).innerHTML = htmlContent
+			document.querySelector(`#column-1`).innerHTML = column1
+			document.querySelector(`#column-2`).innerHTML = column2
+			document.querySelector(`#column-3`).innerHTML = column3
 
 		} else if (dataObj.name == 'labor') {
 			htmlRender = ''
@@ -146,7 +155,7 @@ const DRAW = {
 					<p>${i.name} ${i.regWage}</p>
 				`
 			})
-			document.querySelector('#column-3').innerHTML = htmlRender
+			document.querySelector('#column-4').innerHTML = htmlRender
 		}
 	},
 	
@@ -174,17 +183,16 @@ const DRAW = {
 		} else {
 			document.querySelector('.error-hint').style.display = 'flex';
 			document.querySelector('#error-hint-text').innerHTML = DATA.connectionStatus;
-			
 		}
 		document.querySelector('#toolbar').innerHTML = `
-		<form class="auth">
-			<label for="auth-key">&nbsp Key</label>
-			<input class="input" type="text" id="api-key" name="api-key" placeholder="Enter Security Key to Connect"/>
-			<div id="auth-button">
-				<button>Enroll</button>
-			</div>
-		</form>
-		`
+			<form class="auth">
+				<label for="auth-key">&nbsp Key</label>
+				<input class="input" type="text" id="api-key" name="api-key" placeholder="Enter Security Key to Connect"/>
+				<div id="auth-button">
+					<button>Enroll</button>
+				</div>
+			</form>
+			`
 		document.querySelector('#api-key').value = DATA.key
 		document.querySelector('#api-key').focus()
 		
@@ -195,33 +203,34 @@ const DRAW = {
 	},
 	setToolbarActive: function () {
 		document.querySelector('#toolbar').innerHTML = `
-		<form class="form-wrapper toolbar-actions">
-			<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
-			<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
-			<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
-		</form>
-		
-		<div id="toolbar-functions" class="toolbar-actions">
-			<div id="connection-status" class="status-wrapper toolbar-actions">
-				<div id="connection-status-button">
-					<p id="connection-status-description" class="on-auth-hide">Valid Key:&nbsp<span id="shown-key">${DATA.key}</span></p>
-					<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
+			<form class="form-wrapper toolbar-actions">
+				<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
+				<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
+				<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
+				<input type="number" id="bill" name="bill" placeholder="Bill Ammount">
+			</form>
+			
+			<div id="toolbar-functions" class="toolbar-actions">
+				<div id="connection-status" class="status-wrapper toolbar-actions">
+					<div id="connection-status-button">
+						<p id="connection-status-description" class="on-auth-hide">Valid Key:&nbsp<span id="shown-key">${DATA.key}</span></p>
+						<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
+					</div>
+				</div>
+			
+				<div id="actions-group" class="actions-wrapper toolbar-actions">
+					<div id="merged-left">
+						<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
+					</div>
+					<div id="merged-right">
+						<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
+					</div>
+					<div>
+						<button id="clearButton">Clear</button>
+					</div>
 				</div>
 			</div>
-		
-			<div id="actions-group" class="actions-wrapper toolbar-actions">
-				<div id="merged-left">
-					<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
-				</div>
-				<div id="merged-right">
-					<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
-				</div>
-				<div>
-					<button id="clearButton">Clear</button>
-				</div>
-			</div>
-		</div>
-		`		
+			`		
 		document.querySelector('#toolbar').style.justifyContent = 'space-between'
 		document.querySelector('#toolbar').style.backgroundColor = '#f8f3dd'
 		document.querySelector('#toolbar').style.borderBottom = '1px solid #dad9cf'
