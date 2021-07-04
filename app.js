@@ -119,13 +119,12 @@ const DRAW = {
 					<table class='materials-table'>
 						<tr><td colspan='2' class='table-header'>${i[0]}</td></tr>
 					`
-				
 				DATA.materials.data.forEach( (x) => {
 					if (x.section == i[0]) {
 						let placeholder = () => { if (x.unit != 'whole') { return x.unit } else { return ''} }
 						sectionTable += `
 						<tr class='table-rows'>
-							<td class='qty'><input type='number' min='1' id='qtyOf-${x.id}' placeholder='${placeholder()}'></td>
+							<td class='qty input'><input type='number' min='1' id='qtyOf-${x.id}' placeholder='${placeholder()}'></td>
 							<td class='item-name'><label for='qtyOf-${x.id}'>${x.name}</label></td>
 						</tr>
 						`
@@ -148,12 +147,19 @@ const DRAW = {
 			document.querySelector(`#column-2`).innerHTML = column2
 			document.querySelector(`#column-3`).innerHTML = column3
 
-		} else if (dataObj.name == 'labor') {
-			htmlRender = ''
+		}
+		else if (dataObj.name == 'labor') {
+			let htmlRender = `
+				<table class='labor-table'>
+					<tr><td colspan='2' class='table-header labor'>Labor</td></tr>
+				`
 			DATA.labor.data.forEach( (i) => {
 				htmlRender += `
-					<p>${i.name} ${i.regWage}</p>
-				`
+					<tr class='table-rows'>
+						<td class='input hrs'><input type='number' min='0.25' id='hrsOf-${i.name}' placeholder='hrs'></td>
+						<td class='labor-name'><label for='hrsOf-${i.name}'>${i.name}</label></td>
+					</tr>
+					`
 			})
 			document.querySelector('#column-4').innerHTML = htmlRender
 		}
@@ -233,8 +239,8 @@ const DRAW = {
 			`		
 		document.querySelector('#toolbar').style.justifyContent = 'space-between'
 		document.querySelector('#toolbar').style.backgroundColor = '#f8f3dd'
-		document.querySelector('#toolbar').style.borderBottom = '1px solid #dad9cf'
-		document.querySelector('#toolbar').style.borderTop = '1px solid #dad9cf'
+		document.querySelector('#toolbar').style.borderBottom = '1.5px solid #E7E3CF'
+		document.querySelector('#toolbar').style.borderTop = '1.5px solid #E7E3CF'
 		document.querySelector('.error-hint').style.display = 'none'
 		
 		DRAW.setDatePicker()
