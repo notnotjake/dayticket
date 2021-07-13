@@ -6,9 +6,9 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // * * Set Variables * * * * * * * * * * * * * * * * * * * *
 const airtableURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' //the URL of the airtable project
-const materialsAT = 'Materials'
-const materialsSections = [ ['Prewire & Cable', 1], ['Cable Ends & Jacks', 1], ['Faceplate & Trimout', 2], ['Sound, AV, & Automation', 2], ['Alarm/Security', 2], ['Central Vac', 2] ]
+const materialsAT = 'Materials?view=Sorted'
 const laborAT = 'Labor'
+const materialsSections = [ ['Prewire & Cable', 1], ['Cable Ends & Jacks', 1], ['Faceplate & Trimout', 2], ['Sound, AV, & Automation', 2], ['Alarm/Security', 3], ['Central Vac', 3] ]
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 // ## Define an 'Item' for Materials data object
@@ -95,10 +95,43 @@ const APP = {
 		dataObj.parseData()
 		console.log(dataObj.data)
 		DRAW.table(dataObj)
-	}
+		DATA.formListener(dataObj)
+	},
+	print: function () {
+		console.log('print')
+		var printWindow = window.open("")
+		printWindow.document.write(DRAW.printingPress())
+		printWindow.stop()
+		printWindow.print()
+		printWindow.close()
+	},
+	export: function () {
+		console.log('export')
+	},
+	clearButton: function () {
+		document.querySelectorAll('input').forEach( (x) => {
+			x.value = ''
+		})
+		DRAW.setDatePicker()
+	},
 }
 
-
+// function download(filename, text) {
+// 	var element = document.createElement('a')
+// 	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text))
+// 	element.setAttribute('download', filename)
+// 	element.style.display = 'none'
+// 	document.body.appendChild(element)
+// 	element.click()
+// 	document.body.removeChild(element)
+// }
+// function print() {
+// 	  var printwin = window.open("");
+// 	  printwin.document.write(document.getElementById("to-print").innerHTML);
+// 	  printwin.stop();
+// 	  printwin.print();
+// 	  printwin.close();
+// 	}
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -110,43 +143,58 @@ const DRAW = {
 		if (dataObj.name == 'materials') {
 			let htmlContent = ''
 			
+			let column1 = ''
+			let column2 = ''
+			let column3 = ''
+			
 			DATA.materials.sections.forEach( (i) => {
-				let htmlSectionContent = ``
-				
-				htmlSectionContent += `
+				let sectionTable = `
 					<table class='materials-table'>
 						<tr><td colspan='2' class='table-header'>${i[0]}</td></tr>
 					`
-				
 				DATA.materials.data.forEach( (x) => {
 					if (x.section == i[0]) {
 						let placeholder = () => { if (x.unit != 'whole') { return x.unit } else { return ''} }
-						htmlSectionContent += `
+						sectionTable += `
 						<tr class='table-rows'>
-							<td class='qty'><input type='number' min='1' id='qtyOf-${x.id}' placeholder='${placeholder()}'></td>
+							<td class='qty input'><input type='number' min='1' id='qtyOf-${x.id}' placeholder='${placeholder()}'></td>
 							<td class='item-name'><label for='qtyOf-${x.id}'>${x.name}</label></td>
 						</tr>
 						`
 					}
 				})
 				
-				htmlSectionContent += `</table>`
+				sectionTable += `</table>`
 				
-				htmlContent += htmlSectionContent
-				
+				if (i[1] == 1) {
+					column1 += sectionTable
+				} else if (i[1] == 2) {
+					column2 += sectionTable
+				} else if (i[1] == 3) {
+					column3 += sectionTable
+				}			
 				
 			})
 			
-			document.querySelector(`#column-1`).innerHTML = htmlContent
+			document.querySelector(`#column-1`).innerHTML = column1
+			document.querySelector(`#column-2`).innerHTML = column2
+			document.querySelector(`#column-3`).innerHTML = column3
 
-		} else if (dataObj.name == 'labor') {
-			htmlRender = ''
+		}
+		else if (dataObj.name == 'labor') {
+			let htmlRender = `
+				<table class='labor-table'>
+					<tr><td colspan='2' class='table-header labor'>Labor</td></tr>
+				`
 			DATA.labor.data.forEach( (i) => {
 				htmlRender += `
-					<p>${i.name} ${i.regWage}</p>
-				`
+					<tr class='table-rows'>
+						<td class='input hrs'><input type='number' min='0.25' id='hrsOf-${i.name}' placeholder='hrs'></td>
+						<td class='labor-name'><label for='hrsOf-${i.name}'>${i.name}</label></td>
+					</tr>
+					`
 			})
-			document.querySelector('#column-3').innerHTML = htmlRender
+			document.querySelector('#column-4').innerHTML = htmlRender
 		}
 	},
 	
@@ -174,17 +222,16 @@ const DRAW = {
 		} else {
 			document.querySelector('.error-hint').style.display = 'flex';
 			document.querySelector('#error-hint-text').innerHTML = DATA.connectionStatus;
-			
 		}
 		document.querySelector('#toolbar').innerHTML = `
-		<form class="auth">
-			<label for="auth-key">&nbsp Key</label>
-			<input class="input" type="text" id="api-key" name="api-key" placeholder="Enter Security Key to Connect"/>
-			<div id="auth-button">
-				<button>Enroll</button>
-			</div>
-		</form>
-		`
+			<form class="auth">
+				<label for="auth-key">&nbsp Key</label>
+				<input class="input" type="text" id="api-key" name="api-key" placeholder="Enter Security Key to Connect"/>
+				<div id="auth-button">
+					<button>Enroll</button>
+				</div>
+			</form>
+			`
 		document.querySelector('#api-key').value = DATA.key
 		document.querySelector('#api-key').focus()
 		
@@ -195,37 +242,38 @@ const DRAW = {
 	},
 	setToolbarActive: function () {
 		document.querySelector('#toolbar').innerHTML = `
-		<form class="form-wrapper toolbar-actions">
-			<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
-			<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
-			<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
-		</form>
-		
-		<div id="toolbar-functions" class="toolbar-actions">
-			<div id="connection-status" class="status-wrapper toolbar-actions">
-				<div id="connection-status-button">
-					<p id="connection-status-description" class="on-auth-hide">Valid Key:&nbsp<span id="shown-key">${DATA.key}</span></p>
-					<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
+			<form class="form-wrapper toolbar-actions">
+				<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
+				<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
+				<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
+				<input type="number" id="bill" name="bill" placeholder="Bill Ammount">
+			</form>
+			
+			<div id="toolbar-functions" class="toolbar-actions">
+				<div id="connection-status" class="status-wrapper toolbar-actions">
+					<div id="connection-status-button">
+						<p id="connection-status-description" class="on-auth-hide">Valid Key:&nbsp<span id="shown-key">${DATA.key}</span></p>
+						<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
+					</div>
+				</div>
+			
+				<div id="actions-group" class="actions-wrapper toolbar-actions">
+					<div id="merged-left">
+						<button onclick="APP.print()" id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
+					</div>
+					<div id="merged-right">
+						<button onclick="APP.export()" id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
+					</div>
+					<div>
+					<button onclick="APP.clearButton()" id="clearButton">Clear</button>
+					</div>
 				</div>
 			</div>
-		
-			<div id="actions-group" class="actions-wrapper toolbar-actions">
-				<div id="merged-left">
-					<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
-				</div>
-				<div id="merged-right">
-					<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
-				</div>
-				<div>
-					<button id="clearButton">Clear</button>
-				</div>
-			</div>
-		</div>
-		`		
+			`		
 		document.querySelector('#toolbar').style.justifyContent = 'space-between'
 		document.querySelector('#toolbar').style.backgroundColor = '#f8f3dd'
-		document.querySelector('#toolbar').style.borderBottom = '1px solid #dad9cf'
-		document.querySelector('#toolbar').style.borderTop = '1px solid #dad9cf'
+		document.querySelector('#toolbar').style.borderBottom = '1.5px solid #E7E3CF'
+		document.querySelector('#toolbar').style.borderTop = '1.5px solid #E7E3CF'
 		document.querySelector('.error-hint').style.display = 'none'
 		
 		DRAW.setDatePicker()
@@ -237,6 +285,38 @@ const DRAW = {
 		document.querySelector('#connection-status').addEventListener('mouseout', () => {
 			document.querySelector('#connection-status-description').style.display = 'none'
 		})
+	},
+	
+	printingPress: function () {
+		let inputDate = document.querySelector('#date').value
+		let inputBuilder = document.querySelector('#builder-name').value
+		let inputLot = document.querySelector('#lot-block').value
+		let inputBill = document.querySelector('#bill').value
+		
+		function printMaterialsList () {
+			let materialsList = ``
+			DATA.materials.data.forEach( (x) => {
+				if (x.qty > 0) {
+					materialsList += x.name + " " + x.qty
+				}
+			})
+			return materialsList
+		}
+		
+		return `
+		<head>
+			<style>
+				body {
+					color: green;
+				}
+			</style>
+		</head>
+		<body>
+			<h1>${inputDate} - Bill for ${inputBuilder}</h1>
+			<p>${inputLot} and ${inputBill}</p>
+			<p>${printMaterialsList()}</p>
+		</body>
+		`
 	}
 }
 
@@ -292,6 +372,23 @@ const DATA = {
 			
 			return DATA.labor.data
 		}
+	},
+	
+	formListener: function () {		
+		document.querySelectorAll('input').forEach( (x) => {
+			if (x.id.includes('qtyOf-')) {
+				x.addEventListener('change', (ev) => {
+					DATA.materials.data.forEach( (i) => {
+						if (i.id == x.id.slice(6)) {
+							i.qty = x.value
+						}
+					})
+				})
+			}
+			else {
+				console.log(x.id)
+			}
+		})
 	},
 	
 	connectionStatus: "",
