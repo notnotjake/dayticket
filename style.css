@@ -29,6 +29,11 @@ body {
 	max-width: 1200px;
 }
 
+#beta-message {
+	font-size: 14px;
+	text-align: center;
+	margin-top: 12px;
+}
 
 #toolbar {
 	margin-top: 13px;
