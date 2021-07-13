@@ -99,6 +99,11 @@ const APP = {
 	},
 	print: function () {
 		console.log('print')
+		var printWindow = window.open("")
+		printWindow.document.write(DRAW.printingPress())
+		printWindow.stop()
+		printWindow.print()
+		printWindow.close()
 	},
 	export: function () {
 		console.log('export')
@@ -111,7 +116,22 @@ const APP = {
 	},
 }
 
-
+// function download(filename, text) {
+// 	var element = document.createElement('a')
+// 	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text))
+// 	element.setAttribute('download', filename)
+// 	element.style.display = 'none'
+// 	document.body.appendChild(element)
+// 	element.click()
+// 	document.body.removeChild(element)
+// }
+// function print() {
+// 	  var printwin = window.open("");
+// 	  printwin.document.write(document.getElementById("to-print").innerHTML);
+// 	  printwin.stop();
+// 	  printwin.print();
+// 	  printwin.close();
+// 	}
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -265,6 +285,38 @@ const DRAW = {
 		document.querySelector('#connection-status').addEventListener('mouseout', () => {
 			document.querySelector('#connection-status-description').style.display = 'none'
 		})
+	},
+	
+	printingPress: function () {
+		let inputDate = document.querySelector('#date').value
+		let inputBuilder = document.querySelector('#builder-name').value
+		let inputLot = document.querySelector('#lot-block').value
+		let inputBill = document.querySelector('#bill').value
+		
+		function printMaterialsList () {
+			let materialsList = ``
+			DATA.materials.data.forEach( (x) => {
+				if (x.qty > 0) {
+					materialsList += x.name + " " + x.qty
+				}
+			})
+			return materialsList
+		}
+		
+		return `
+		<head>
+			<style>
+				body {
+					color: green;
+				}
+			</style>
+		</head>
+		<body>
+			<h1>${inputDate} - Bill for ${inputBuilder}</h1>
+			<p>${inputLot} and ${inputBill}</p>
+			<p>${printMaterialsList()}</p>
+		</body>
+		`
 	}
 }
 
