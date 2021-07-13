@@ -95,7 +95,20 @@ const APP = {
 		dataObj.parseData()
 		console.log(dataObj.data)
 		DRAW.table(dataObj)
-	}
+		DATA.formListener(dataObj)
+	},
+	print: function () {
+		console.log('print')
+	},
+	export: function () {
+		console.log('export')
+	},
+	clearButton: function () {
+		document.querySelectorAll('input').forEach( (x) => {
+			x.value = ''
+		})
+		DRAW.setDatePicker()
+	},
 }
 
 
@@ -226,13 +239,13 @@ const DRAW = {
 			
 				<div id="actions-group" class="actions-wrapper toolbar-actions">
 					<div id="merged-left">
-						<button id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
+						<button onclick="APP.print()" id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
 					</div>
 					<div id="merged-right">
-						<button id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
+						<button onclick="APP.export()" id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
 					</div>
 					<div>
-						<button id="clearButton">Clear</button>
+					<button onclick="APP.clearButton()" id="clearButton">Clear</button>
 					</div>
 				</div>
 			</div>
@@ -307,6 +320,23 @@ const DATA = {
 			
 			return DATA.labor.data
 		}
+	},
+	
+	formListener: function () {		
+		document.querySelectorAll('input').forEach( (x) => {
+			if (x.id.includes('qtyOf-')) {
+				x.addEventListener('change', (ev) => {
+					DATA.materials.data.forEach( (i) => {
+						if (i.id == x.id.slice(6)) {
+							i.qty = x.value
+						}
+					})
+				})
+			}
+			else {
+				console.log(x.id)
+			}
+		})
 	},
 	
 	connectionStatus: "",
