@@ -125,13 +125,6 @@ const APP = {
 // 	element.click()
 // 	document.body.removeChild(element)
 // }
-// function print() {
-// 	  var printwin = window.open("");
-// 	  printwin.document.write(document.getElementById("to-print").innerHTML);
-// 	  printwin.stop();
-// 	  printwin.print();
-// 	  printwin.close();
-// 	}
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -304,18 +297,122 @@ const DRAW = {
 		}
 		
 		return `
-		<head>
-			<style>
-				body {
-					color: green;
-				}
-			</style>
-		</head>
-		<body>
-			<h1>${inputDate} - Bill for ${inputBuilder}</h1>
-			<p>${inputLot} and ${inputBill}</p>
-			<p>${printMaterialsList()}</p>
-		</body>
+		<html lang="en">
+			<head>
+				<meta charset="utf-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+				<style>
+					@import url('https://rsms.me/inter/inter.css');
+					html { font-family: 'Inter', sans-serif; }
+					@supports (font-variation-settings: normal) {
+					  html { font-family: 'Inter var', sans-serif; }
+					}
+					body {
+						-webkit-print-color-adjust: exact !important;
+					}
+					.container {
+						width: 5in;
+						margin: 8pt auto;
+					}
+					.header {
+						display: grid;
+						grid-template-columns: 20% 20% 60%;
+						margin-bottom: 8pt;
+					}
+					.header h3 {
+						font-size: 10pt;
+						font-weight: 500;
+						color: #3a3a3a;
+						margin: 0;
+					}
+					.header p {
+						font-size: 12pt;
+						font-weight: 600;
+						color: black;
+						margin: 0;
+					}		
+					table {
+						width: 100%;
+						margin-bottom: 6pt;
+						border-collapse: collapse;
+						font-size: 10pt;
+					}
+					table * {
+						padding-left: 3pt;
+						padding-right: 3pt;
+					}
+					.col1 {
+						width: 3.25in;
+					}
+					td:nth-child(3) {
+						text-align: right;
+					}
+					.heading {
+						background-color: #1f1f1f;
+						color: white;
+						font-weight: 700;
+						font-size: 11pt;
+					}
+					.heading td {
+						padding: 4pt 3pt 2pt;
+					}
+					.subheading {
+						background-color: #dcdcdc;
+						border-bottom: 1px solid #adadad;
+						font-weight: 600;
+						font-size: 10pt;
+					}
+					.subheading td {
+						padding: 2pt 3pt 1pt;
+					}
+					.total-line {
+						border-top: 2px solid #636363;
+					}
+					.total-line td {
+						padding: 2pt 3pt;
+					}
+					.total-line b {
+						padding: 0;
+					}
+				</style>
+			</head>
+			<body>
+				<div class="container">
+					<div class="header">
+						<div>
+							<h3>Builder</h3>
+							<p>${inputBuilder}</p>
+						</div>
+						<div>
+							<h3>Lot & Block</h3>
+							<p>${inputLot}</p>
+						</div>
+						<div>
+							<h3>Date</h3>
+							<p>${inputDate}</p>
+						</div>
+					</div>
+					<table>
+						<tr class="heading"><td colspan='3'>Report Summary</td></tr>
+						<tr class="subheading"><td>Billing</td><td></td><td>$${inputBill}</td></tr>
+						<tr><td class="col1">Labor</td><td></td><td>$300</td></tr>
+						<tr><td>Materials (Incl 6% Sales Tax)</td><td></td><td>$240.30</td></tr>
+						<tr class="total-line"><td><b>Total Cost</b></td><td></td><td><b>$610.03</b></td></tr>
+						<tr class="total-line"><td><b>Gross Profit</b></td><td>13.4%</td><td><b>$210.05<b></td></tr>
+					</table>
+					<table>
+						<tr class="heading"><td colspan='3'>Labor Cost</td></tr>
+						<tr class="subheading"><td>Labor</td><td>Hours</td><td>Total Cost</td></tr>
+						<tr><td class="col1">Helper ($20/hr)</td><td>3.00</td><td>$60.00</td></tr>
+					</table>	
+					<table>
+						<tr class="heading"><td colspan='3'>Materials Cost</td></tr>
+						<tr class="subheading"><td class="col1">Product</td><td>Qty</td><td>Total Cost</td></tr>
+						<tr><td>1G LV RING (LV-1)</td><td>5</td><td>$7.00</td></tr>
+					</table>
+				</div>
+			</body>
+		</html>
 		`
 	}
 }
