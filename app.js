@@ -286,15 +286,21 @@ const DRAW = {
 		let inputLot = document.querySelector('#lot-block').value
 		let inputBill = document.querySelector('#bill').value
 		
+		let materialsCost = 0
+		
 		function printMaterialsList () {
 			let materialsList = ``
 			DATA.materials.data.forEach( (x) => {
 				if (x.qty > 0) {
-					materialsList += x.name + " " + x.qty
+					materialsList += `
+					<tr><td>${x.name}</td><td>${x.qty}</td><td>$${(x.cost) * (x.qty)}</td></tr>`
+					materialsCost += x.qty * x.cost
 				}
 			})
 			return materialsList
 		}
+		
+		printMaterialsList()
 		
 		return `
 		<html lang="en">
@@ -396,7 +402,7 @@ const DRAW = {
 						<tr class="heading"><td colspan='3'>Report Summary</td></tr>
 						<tr class="subheading"><td>Billing</td><td></td><td>$${inputBill}</td></tr>
 						<tr><td class="col1">Labor</td><td></td><td>$300</td></tr>
-						<tr><td>Materials (Incl 6% Sales Tax)</td><td></td><td>$240.30</td></tr>
+						<tr><td>Materials (Incl 6% Sales Tax)</td><td></td><td>$${materialsCost}</td></tr>
 						<tr class="total-line"><td><b>Total Cost</b></td><td></td><td><b>$610.03</b></td></tr>
 						<tr class="total-line"><td><b>Gross Profit</b></td><td>13.4%</td><td><b>$210.05<b></td></tr>
 					</table>
@@ -409,6 +415,7 @@ const DRAW = {
 						<tr class="heading"><td colspan='3'>Materials Cost</td></tr>
 						<tr class="subheading"><td class="col1">Product</td><td>Qty</td><td>Total Cost</td></tr>
 						<tr><td>1G LV RING (LV-1)</td><td>5</td><td>$7.00</td></tr>
+						${printMaterialsList()}
 					</table>
 				</div>
 			</body>
