@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!--Site Info-->
+	<meta charset="utf-8">
+	<title>Browse!</title>
+	<meta name="author" content="Jake Gooch">
+	<meta name="description" content="I'm Jake: Apple enthusiast, designer and artist. I post my thoughts here">
+	<link rel="canonical" href="https://www.notnotjake.com/posts/">
+	<!--Appearance-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+	<!-- <link rel="stylesheet" type="text/css" href="/style.css"> -->
+	<link rel="apple-touch-icon" href="https://www.notnotjake.com/images/favicon.png">
+	<link rel="icon" type="image/png" sizes="271x271" href="https://www.notnotjake.com/images/favicon.png">
+	<!-- OpenGraph -->
+	<meta property="og:title" content="Archives">
+	<meta property="og:site_name" content="NotNot Jake">
+	<meta property="og:url" content="https://www.notnotjake.com/posts/">
+	<meta property="og:type" content="website">
+	<meta property="og:description" content="All the past posts I've made here">
+	<meta property="og:image" content="https://www.notnotjake.com/images/sharing-sitewide.png">
+	<!-- Twitter Cards -->
+	<meta property="twitter:card" content="summary">
+	<meta property="twitter:site" content="@_notnotjake">
+	<meta property="twitter:creator" content="@_notnotjake">
+	<meta property="twitter:title" content="NotNot Jake - Archives>
+	<meta property="twitter:description" content="All the past posts I've made here">
+	<meta property="twitter:image" content="https://www.notnotjake.com/images/sharing-sitewide.png">
+	
+	<style>
+		@import url('https://rsms.me/inter/inter.css');
+		@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css");
+		html, button, input, select, textarea {
+			font-family: 'Inter', sans-serif;
+		}
+		@supports (font-variation-settings: normal) {
+			html, button, input, select, textarea {
+				font-family: 'Inter var', sans-serif;
+			}
+		}
+		
+		body {
+			background-color: #f6f6f3;
+			margin: 0;
+		}
+		
+		.toolbar, .toolbar-inputs, .toolbar-buttons {
+			display: flex;
+		}
+		.toolbar {
+			justify-content: space-between;
+			flex-wrap: wrap-reverse;
+			width: 100%;
+			background-color: #fdfdfc;
+			border-bottom: 1.5px solid #f0f0f0;
+			//border-top: 1.5px solid #f0f0f0;
+			padding: 10px 0;
+			margin: 0px 0 10px 0;
+		}
+		.toolbar > div {
+			margin: 0 12px;
+		}
+		.input {
+			height: 33px;
+			width: 170px;
+			background-color: #e7e7e7;
+			border-radius: 5px;
+			display: flex;
+			align-items: center;
+			margin-right: 6px;
+		}
+		.billing {
+			width: 110px;
+		}
+		.lot {
+			width: 90px;
+		}
+		.date {
+			width: auto;
+		}
+		input {
+			box-sizing: border-box;
+			background-color: transparent;
+			border: none;
+			padding: 0 10px 0 10px;
+			border-radius: 5px;
+			height: 100%;
+			width: 100%;
+			font-size: 13px;
+			font-weight: 500;
+		}
+		::placeholder {
+			color: #505050;
+			font-weight: 400;
+		}
+		input::-webkit-outer-spin-button,
+		input::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+		}
+		
+		.input p {
+			width: 20px;
+			padding-left: 8px;
+			text-align: left;
+		}
+		#billing {
+			margin-left: -28px;
+			text-align: right;
+		}
+		
+		button {
+			border: none;
+			height: 33px;
+			width: 80px;
+			border-radius: 30px;
+			margin-right: 10px;
+			background-color: white;
+			border: 1px solid #bcbcbc;
+		}
+		
+		.section-table {
+			width: 300px;
+			background-color: #e8e7df;
+			margin-left: 20px;
+			border-bottom: 1.5px solid #cccccc;
+		}
+		.section-table h1 {
+			font-size: 15px;
+			font-weight: 400;
+			background-color: #E5EDF1;
+			border-bottom: 1px solid #A9C5D4;
+			border-top: 1.5px solid #A9C5D4; 
+			padding: 5px 5px;
+			margin: 0;
+		}
+		.section-table button {
+			margin: 0 5px 0 0;
+			padding: 0;
+			background-color: transparent;
+			border: none;
+			width: auto;
+			height: auto;
+			cursor: pointer;
+		}
+		.section-table button:active {
+			color: #777792;
+		}
+		.section-table ul {
+			list-style: none;
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+		}
+		.section-table li {
+			border-bottom: 1px solid #cccccc;
+			font-size: 14px;
+			display: flex;
+		}
+		.section-table p {
+			padding: 5px 5px 3px 0;
+			margin: 0;
+		}
+		.section-table input {
+			position: relative;
+			background-color: #f0efeb;
+			width: 60px;
+			min-height: 29px;
+			border-radius: 0;
+			margin-right: 5px;
+			text-align: right;
+			padding-right: 5px;
+			color: #3b6eb7;
+		}
+		.input-wrapper {
+			height: available;
+		}
+		.section-table input:focus {
+			background-color: #f6f5f0;
+			z-index: 2;
+		}
+		.section-table input:invalid {
+			background-color: #fee9e6;
+			color: #d0434d;
+		}
+		
+		
+		
+		
+		
+	</style>
+</head>
+	<body>
+		<div class="toolbar">
+			<div class="toolbar-inputs">
+				<div class="input date">
+					<input id="date" type="date" placeholder="Builder" value="2021-01-01" min="2021-01-01" max="2050-12-31"/>
+				</div>
+				<div class="input builder">
+					<input id="builder" type="text" placeholder="Builder"/>
+				</div>
+				<div class="input lot">
+					<input id="lot" type="text" placeholder="Lot"/>
+				</div>
+				<div class="input billing">
+					<p>$</p>
+					<input id="billing" type="text" placeholder="Billing" onclick="select()"/>
+				</div>
+			</div>
+			<div class="toolbar-buttons">
+				<div class="btn print">
+					<button>Print</button>
+				</div>
+				<div class="btn print">
+					<button>Export</button>
+				</div>
+				<div class="btn print">
+					<button>Clear</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="content">
+			<div class="column1"></div>
+			<div class="column2"></div>
+			<div class="column3"></div>
+			<div class="column4"></div>
+		</div>
+		
+		<div class="section-table">
+			<h1><button id='expandButton' onclick="toggleExpand()"><i class="bi bi-caret-down-fill"></i></button>Materials</h1>
+			<ul id='hide'>
+				<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
+				<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
+			</ul>
+		</div>
+		
+		
+		<script>
+			let indicator = document.querySelector('#expandButton')
+			indicator.innerHTML = '<i class="bi bi-caret-down-fill">'
+			let divExpanded = true
+			
+			function toggleExpand () {
+				if (divExpanded) {
+					console.log('Collapsing...')
+					indicator.innerHTML = '<i class="bi bi-caret-right-fill">'
+					document.querySelector('#hide').style.display = 'none'
+					divExpanded = false
+				} else {
+					console.log('Expanding')
+					indicator.innerHTML = '<i class="bi bi-caret-down-fill">'
+					document.querySelector('#hide').style.display = 'block'
+					divExpanded = true
+				}
+			}
+			
+			
+			
+			
+			//table section:
+			// var tableSectionName = ''
+			// var tableData = []
+			// var expanded = true
+			// 
+			// tableSectionName = 'Materials'
+			// tableData = ['Entry 1', 'Entry 2']
+			// 
+			// let tableSection = document.createElement('div')
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			// let x = document.createElement('div')
+			// let n = document.createElement('p')
+			// n.innerHTML = 'hello yes'
+			// x.appendChild(n)
+			// document.querySelector('.content-container').insertAdjacentElement('beforeend', x)
+						
+			// function expanded () {
+			// 	let column = document.querySelector('#column')
+			// 	console.log(column)
+			// 	
+			// 	let expandState = column.dataset.expanded
+			// 	console.log(expandState)
+			// 	
+			// 	if (expandState == 'y') {
+			// 		console.log('Yes!')
+			// 		document.querySelector('#materials-tri').innerHTML = '<button onclick="expanded()"><i class="bi bi-caret-right-fill"></button></i>'
+			// 		column.dataset.expanded = 'n'
+			// 	} else if (expandState == 'n') {
+			// 		console.log('No!')
+			// 		document.querySelector('#materials-tri').innerHTML = '<button onclick="expanded()"><i class="bi bi-caret-down-fill"></button></i>'
+			// 		column.dataset.expanded = 'n'
+			// 	}
+			// 	
+			// 	console.log(column)
+			// }
+			
+			
+			let input = document.querySelector('#billing')
+			
+			let timeout = null
+			
+			function multiply (n) {
+				index = n.search('[*]')
+				term1 = parseFloat(n.substring(0, index) )
+				term2 = parseFloat(n.substring(index+1) )
+				n = term1 * term2
+				//console.log(n)
+				
+				return n
+			}
+			function divide (n) {
+				index = n.search('/')
+				dividend = parseFloat(n.substring(0, index) )
+				divisor = parseFloat(n.substring(index+1) )
+				n = dividend / divisor
+				//console.log(n)
+				
+				return n
+			}
+			function add (n) {
+				index = n.search('[+]')
+				firstTerm = parseFloat(n.substring(0, index) )
+				secondTerm = parseFloat(n.substring(index+1) )
+				n = firstTerm + secondTerm
+				//console.log(n)
+				
+				return n
+			}
+			function subtract (n) {
+				index = n.search('[-]')
+				firstTerm = parseFloat(n.substring(0, index) )
+				secondTerm = parseFloat(n.substring(index+1) )
+				n = firstTerm - secondTerm
+				//console.log(n)
+				
+				return n
+			}
+			
+			function currency (n) {
+				while (n.includes(',')) {
+					index = n.search(',')
+					n = n.substring(0, index) + n.substring(index+1)
+				}
+				
+				if (n.includes('*')) {
+					n = multiply(n)
+				} else if (n.includes('/')) {
+					n = divide(n)
+				} else if (n.includes('-')) {
+					n = subtract(n)
+				} else if (n.includes('+')) {
+					n = add(n)
+				}
+				
+				n = parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+				
+				return n
+			}
+			
+			input.addEventListener('keyup', () => {
+				clearTimeout(timeout)
+				timeout = setTimeout(function () {
+					//do something after delay typing
+				}, 900)
+			})
+			
+			input.addEventListener('blur', () => {
+				if (input.value != '') {
+					input.value = currency(input.value)
+				}
+			})
+			
+			
+		</script>
+	</body>
+</html>
