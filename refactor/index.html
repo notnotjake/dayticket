@@ -38,7 +38,6 @@
 				font-family: 'Inter var', sans-serif;
 			}
 		}
-		
 		body {
 			background-color: #f6f6f3;
 			margin: 0;
@@ -50,24 +49,26 @@
 		.toolbar {
 			justify-content: space-between;
 			flex-wrap: wrap-reverse;
+			padding: 10px 0 0;
+			margin: 0px 0 10px 0;
 			width: 100%;
+			
 			background-color: #f1f0ec;
 			border-bottom: 1.5px solid #e4e3dd;
 			//border-top: 1.5px solid #f0f0f0;
-			padding: 10px 0 8px;
-			margin: 0px 0 10px 0;
 		}
 		.toolbar > div {
-			margin: 0 12px;
+			margin: 0 12px 8px;
 		}
 		.input {
 			height: 33px;
 			width: 170px;
-			background-color: #dddddd;
-			border-radius: 5px;
 			display: flex;
 			align-items: center;
 			margin-right: 6px;
+			
+			background-color: #dddddd;
+			border-radius: 5px;
 		}
 		.billing {
 			width: 110px;
@@ -80,12 +81,13 @@
 		}
 		.toolbar input, .section-table input {
 			box-sizing: border-box;
-			background-color: transparent;
-			border: none;
 			padding: 0 10px 0 10px;
-			border-radius: 5px;
 			height: 100%;
 			width: 100%;
+			
+			background-color: transparent;
+			border: none;
+			border-radius: 5px;
 			font-size: 13px;
 			font-weight: 500;
 		}
@@ -109,18 +111,18 @@
 		}
 		
 		.toolbar-buttons button, .auth button {
+			padding: 0 15px;
+			height: 33px;
+			margin-right: 10px;
+			
 			font-size: 13px;
 			font-weight: 500;
 			border: none;
-			height: 33px;
-			//width: ;
 			border-radius: 5px;
-			margin-right: 10px;
 			background-color: #ffffff;
 			border-top: 1px solid #e7e7e7;
 			border-bottom: 1px solid #d1d1d1;
 			cursor: pointer;
-			padding: 0 15px;
 		}
 		.toolbar-buttons button:hover {
 			background-color: #f6f6f6;
@@ -147,12 +149,21 @@
 		
 		
 		
-		
+		.content-container {
+			margin: 0 20px;
+			background-color: red;
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+		}
+		.column {
+			background-color: blue;
+			width: calc(25% - 5px);
+		}
 		
 		.section-table {
-			width: 300px;
+			width: 100%;
 			background-color: #e8e7df;
-			margin-left: 20px;
 			border-bottom: 1.5px solid #cccccc;
 		}
 		.section-table h1 {
@@ -218,29 +229,31 @@
 		
 		
 		
-		
-		.auth-container {
+		.app-controls {
 			margin: 50px auto 60px;
 			width: 360px;
 			padding: 9px 0px 10px;
 			background-color: #eeede6;
 			border-radius: 10px;
 		}
+		.auth-container {
+			margin-bottom: 100px;
+		}
 		.auth-container h2 {
-			text-align: center;
-			margin-bottom: 25px;
+			text-align: left;
+			margin: 27px 29px 4px;
+		}
+		.auth-container p {
+			margin: 0 29px 17px;
+			font-size: 14px;
 		}
 		.new-auth {
 			width: 320px;
 			height: 42px;
 			margin-left: 20px;
 			margin-right: 20px;
-			//border-radius: 7px;
-			//border: 2px solid #dddddd;
 			display: flex;
-			//justify-content: space-between;
 			align-items: center;
-			//margin: auto;
 		}
 		.new-auth input {
 			background-color: #dbdbdb;
@@ -270,8 +283,7 @@
 		.new-auth button:active {
 			color: #4ccd4b;
 		}
-		.auth-container p {
-			//margin-left: 29px;
+		#auth-help {
 			margin: 7px 29px 0;
 			font-size: 14px;
 			color: #f59706;
@@ -282,15 +294,15 @@
 			width: 180px;
 			display: flex;
 			justify-content: space-between;
-			margin: 40px auto 10px;
+			margin: 12px auto;
 		}
 		.footer a {
-			font-size: 14px;
-			text-decoration: none;
-			color: #304e74;
-			font-weight: 500;
 			padding: 8px 10px;
 			border-radius: 5px;
+			font-size: 14px;
+			font-weight: 500;
+			color: #304e74;
+			text-decoration: none;
 		}
 		.footer a:hover {
 			color: #2a6bbc;
@@ -322,13 +334,57 @@
 			</div>
 		</div>
 		
-		<div class="auth-container">
-			<h2>Authenticate to Start Using</h2>
-			<div class="new-auth">
-				<input type="text" id="new-auth-key" autofocus placeholder="Security Key"/>
-				<button id="new-auth-enroll"><i class="bi bi-arrow-right-circle-fill"></i></button>
+		<div class="content-container">
+			<div class="column" id="column-1">
+				<div class="section-table">
+					<h1><button id='expandButton-01' onclick="toggleExpand('#section-01')"><i class="bi bi-caret-down-fill"></i></button>Materials</h1>
+					<ul id='section-01'>
+						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
+						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
+					</ul>
+				</div>
 			</div>
-			<p id="auth-help"><i class="bi bi-exclamation-circle-fill"></i>Invalid Key</p>
+			<div class="column" id="column-2">
+				<div class="section-table">
+					<h1><button id='expandButton-02' onclick="toggleExpand('#section-02')"><i class="bi bi-caret-down-fill"></i></button>Materials</h1>
+					<ul id='section-02'>
+						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
+						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
+					</ul>
+				</div>
+			</div>
+			<div class="column" id="column-3">
+				<div class="section-table">
+					<h1><button id='expandButton-03' onclick="toggleExpand('#section-03')"><i class="bi bi-caret-down-fill"></i></button>Materials</h1>
+					<ul id='section-03'>
+						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
+						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
+					</ul>
+				</div>
+			</div>
+			<div class="column" id="column-4">
+				<div class="section-table">
+					<h1><button id='expandButton-04' onclick="toggleExpand(this)"><i class="bi bi-caret-down-fill"></i></button>Labor</h1>
+					<ul id='section-04'>
+						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
+						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
+					</ul>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		<div class="app-controls">
+			<div class="auth-container">
+				<h2>Authenticate</h2>
+				<p>You're device will be remembered for 30 days</p>
+				<div class="new-auth">
+					<input type="text" id="new-auth-key" autofocus placeholder="Security Key"/>
+					<button id="new-auth-enroll"><i class="bi bi-arrow-right-circle-fill"></i></button>
+				</div>
+				<p id="auth-help"><i class="bi bi-exclamation-circle-fill"></i>Invalid Key</p>
+			</div>
 			
 			<div class="footer">
 				<a href="/help"><i class="bi bi-question-circle-fill"></i> Help</a>
@@ -336,13 +392,6 @@
 			</div>
 		</div>
 		
-		<div class="section-table">
-			<h1><button id='expandButton' onclick="toggleExpand()"><i class="bi bi-caret-down-fill"></i></button>Materials</h1>
-			<ul id='hide'>
-				<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
-				<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
-			</ul>
-		</div>
 		
 		
 		<script>
@@ -356,7 +405,10 @@
 			indicator.innerHTML = '<i class="bi bi-caret-down-fill">'
 			let divExpanded = true
 			
-			function toggleExpand () {
+			function toggleExpand (id) {
+				let element = document.querySelector(id)
+				console.log(element)
+				
 				if (divExpanded) {
 					console.log('Collapsing...')
 					indicator.innerHTML = '<i class="bi bi-caret-right-fill">'
@@ -374,6 +426,12 @@
 			let input = document.querySelector('#billing')
 			
 			let timeout = null
+			input.addEventListener('keyup', () => {
+				clearTimeout(timeout)
+				timeout = setTimeout(function () {
+					//do something after delay typing
+				}, 900)
+			})
 			
 			function multiply (n) {
 				index = n.search('[*]')
@@ -432,13 +490,6 @@
 				
 				return n
 			}
-			
-			input.addEventListener('keyup', () => {
-				clearTimeout(timeout)
-				timeout = setTimeout(function () {
-					//do something after delay typing
-				}, 900)
-			})
 			
 			input.addEventListener('blur', () => {
 				if (input.value != '') {
