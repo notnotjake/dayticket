@@ -107,6 +107,22 @@ const APP = {
 	},
 	export: function () {
 		console.log('export')
+		
+		download('test.txt', 'hello world')
+		
+		function download(filename, contents) {
+			var element = document.createElement('a')
+			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('Hello World'))
+			element.setAttribute('download', filename)
+			
+			element.style.display = 'none'
+			document.body.appendChild(element)
+			
+			element.click()
+			
+			document.body.removeChild(element)
+		}
+		
 	},
 	clearButton: function () {
 		document.querySelectorAll('input').forEach( (x) => {
@@ -115,16 +131,6 @@ const APP = {
 		DRAW.setDatePicker()
 	},
 }
-
-// function download(filename, text) {
-// 	var element = document.createElement('a')
-// 	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text))
-// 	element.setAttribute('download', filename)
-// 	element.style.display = 'none'
-// 	document.body.appendChild(element)
-// 	element.click()
-// 	document.body.removeChild(element)
-// }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -315,6 +321,7 @@ const DRAW = {
 					}
 					body {
 						-webkit-print-color-adjust: exact !important;
+						color-adjust: exact !important;
 					}
 					.container {
 						width: 5in;
@@ -414,7 +421,6 @@ const DRAW = {
 					<table>
 						<tr class="heading"><td colspan='3'>Materials Cost</td></tr>
 						<tr class="subheading"><td class="col1">Product</td><td>Qty</td><td>Total Cost</td></tr>
-						<tr><td>1G LV RING (LV-1)</td><td>5</td><td>$7.00</td></tr>
 						${printMaterialsList()}
 					</table>
 				</div>

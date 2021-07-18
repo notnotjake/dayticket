@@ -24,7 +24,7 @@ body {
 	display: flex;
 	justify-content: center;
 }
-#container {
+.container {
 	width: 100%;
 	max-width: 1200px;
 }
@@ -388,14 +388,8 @@ footer p > a:hover {
 	color: #646058;
 }
 
-
-@media (max-width: 900px) {
-	#container {
-		margin: 0 20px;
-	}
-}
 @media (max-width: 700px) {
-	#container, #toolbar {
+	.container, #toolbar {
 		margin: 0;
 	}
 	#toolbar {
