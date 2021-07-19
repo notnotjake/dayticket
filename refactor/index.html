@@ -46,12 +46,16 @@
 		.toolbar, .toolbar-inputs, .toolbar-buttons {
 			display: flex;
 		}
+		.toolbar-buttons {
+			justify-content: flex-end;
+			flex: 1 1 auto;
+		}
+		
 		.toolbar {
 			justify-content: space-between;
 			flex-wrap: wrap-reverse;
 			padding: 10px 0 0;
 			margin: 0px 0 10px 0;
-			width: 100%;
 			
 			background-color: #f1f0ec;
 			border-bottom: 1.5px solid #e4e3dd;
@@ -113,7 +117,7 @@
 		.toolbar-buttons button, .auth button {
 			padding: 0 15px;
 			height: 33px;
-			margin-right: 10px;
+			margin-left: 10px;
 			
 			font-size: 13px;
 			font-weight: 500;
@@ -150,14 +154,12 @@
 		
 		
 		.content-container {
-			margin: 0 20px;
-			background-color: red;
+			margin: 17px 12px;
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: space-between;
 		}
 		.column {
-			background-color: blue;
 			width: calc(25% - 5px);
 		}
 		
@@ -165,6 +167,7 @@
 			width: 100%;
 			background-color: #e8e7df;
 			border-bottom: 1.5px solid #cccccc;
+			margin-bottom: 10px;
 		}
 		.section-table h1 {
 			font-size: 15px;
@@ -174,6 +177,11 @@
 			border-top: 1.5px solid #A9C5D4; 
 			padding: 5px 5px;
 			margin: 0;
+		}
+		.section-table h1.labor {
+			border-bottom: 1px solid #9fbeb9;
+			border-top: 1.5px solid #9fbeb9;
+			background-color: #deece9;
 		}
 		.section-table button {
 			margin: 0 5px 0 0;
@@ -195,11 +203,12 @@
 		}
 		.section-table li {
 			border-bottom: 1px solid #cccccc;
-			font-size: 14px;
+			font-size: 13px;
 			display: flex;
+			align-items: center;
 		}
 		.section-table p {
-			padding: 5px 5px 3px 0;
+			padding: 0 6px;
 			margin: 0;
 		}
 		.section-table input {
@@ -208,7 +217,6 @@
 			width: 60px;
 			min-height: 29px;
 			border-radius: 0;
-			margin-right: 5px;
 			text-align: right;
 			padding-right: 5px;
 			color: #3b6eb7;
@@ -230,14 +238,14 @@
 		
 		
 		.app-controls {
-			margin: 50px auto 60px;
+			margin: 90px auto 60px;
 			width: 360px;
 			padding: 9px 0px 10px;
 			background-color: #eeede6;
 			border-radius: 10px;
 		}
 		.auth-container {
-			margin-bottom: 100px;
+			margin-bottom: 130px;
 		}
 		.auth-container h2 {
 			text-align: left;
@@ -308,6 +316,7 @@
 			color: #2a6bbc;
 			background-color: #e3dfd4;
 		}
+		
 	</style>
 </head>
 	<body>
@@ -335,45 +344,11 @@
 		</div>
 		
 		<div class="content-container">
-			<div class="column" id="column-1">
-				<div class="section-table">
-					<h1><button id='expandButton-01' onclick="toggleExpand('#section-01')"><i class="bi bi-caret-down-fill"></i></button>Materials</h1>
-					<ul id='section-01'>
-						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
-						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
-					</ul>
-				</div>
-			</div>
-			<div class="column" id="column-2">
-				<div class="section-table">
-					<h1><button id='expandButton-02' onclick="toggleExpand('#section-02')"><i class="bi bi-caret-down-fill"></i></button>Materials</h1>
-					<ul id='section-02'>
-						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
-						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
-					</ul>
-				</div>
-			</div>
-			<div class="column" id="column-3">
-				<div class="section-table">
-					<h1><button id='expandButton-03' onclick="toggleExpand('#section-03')"><i class="bi bi-caret-down-fill"></i></button>Materials</h1>
-					<ul id='section-03'>
-						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
-						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
-					</ul>
-				</div>
-			</div>
-			<div class="column" id="column-4">
-				<div class="section-table">
-					<h1><button id='expandButton-04' onclick="toggleExpand(this)"><i class="bi bi-caret-down-fill"></i></button>Labor</h1>
-					<ul id='section-04'>
-						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>1 1/2" INNER DUCT (ORG)</p></li></label>
-						<label><li><div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div><p>ROLL OF PLAST STRAP (By FT) go to a new line now you go to another new line please and thank you great job</p></li></label>
-					</ul>
-				</div>
-			</div>
+			<div class="column" id="column-1"></div>
+			<div class="column" id="column-2"></div>
+			<div class="column" id="column-3"></div>
+			<div class="column" id="column-4"></div>
 		</div>
-		
-		
 		
 		<div class="app-controls">
 			<div class="auth-container">
@@ -381,7 +356,7 @@
 				<p>You're device will be remembered for 30 days</p>
 				<div class="new-auth">
 					<input type="text" id="new-auth-key" autofocus placeholder="Security Key"/>
-					<button id="new-auth-enroll"><i class="bi bi-arrow-right-circle-fill"></i></button>
+					<button id="new-auth-enroll" onclick="authShow()"><i class="bi bi-arrow-right-circle-fill"></i></button>
 				</div>
 				<p id="auth-help"><i class="bi bi-exclamation-circle-fill"></i>Invalid Key</p>
 			</div>
@@ -392,37 +367,8 @@
 			</div>
 		</div>
 		
-		
-		
+		<!-- Billing Input -->
 		<script>
-			// let x = document.createElement('div')
-			// let n = document.createElement('p')
-			// n.innerHTML = 'hello yes'
-			// x.appendChild(n)
-			// document.querySelector('.content-container').insertAdjacentElement('beforeend', x)
-			
-			let indicator = document.querySelector('#expandButton')
-			indicator.innerHTML = '<i class="bi bi-caret-down-fill">'
-			let divExpanded = true
-			
-			function toggleExpand (id) {
-				let element = document.querySelector(id)
-				console.log(element)
-				
-				if (divExpanded) {
-					console.log('Collapsing...')
-					indicator.innerHTML = '<i class="bi bi-caret-right-fill">'
-					document.querySelector('#hide').style.display = 'none'
-					divExpanded = false
-				} else {
-					console.log('Expanding')
-					indicator.innerHTML = '<i class="bi bi-caret-down-fill">'
-					document.querySelector('#hide').style.display = 'block'
-					divExpanded = true
-				}
-			}
-			
-			
 			let input = document.querySelector('#billing')
 			
 			let timeout = null
@@ -496,8 +442,69 @@
 					input.value = currency(input.value)
 				}
 			})
+		</script>
+		
+		<!-- Section Component -->
+		<script>
+			
+			let shownIcon = '<i class="bi bi-caret-down-fill"></i>'
+			let hiddenIcon = '<i class="bi bi-caret-right-fill"></i>'
+			
+			function addSection (column, name, data, headerClass) {
+				
+				let section = document.createElement('div')
+					section.classList.add('section-table')
+				
+				let sectionList = document.createElement('ul')
+				data.forEach( (x) => {
+					let item = document.createElement('label')
+					item.innerHTML = `
+						<li>
+							<div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div>
+							<p>${x}</p>
+						</li>`
+					sectionList.appendChild(item)
+				})
+				
+				let sectionHeader = document.createElement('h1')
+					sectionHeader.innerText = name
+					sectionHeader.classList.add(headerClass)
+				
+				let expandButton = document.createElement('button')
+					sectionList.style.display = 'block'
+					expandButton.innerHTML = shownIcon
+					expandButton.addEventListener('click', () => {
+						if (sectionList.style.display == 'block') {
+							sectionList.style.display = 'none'
+							expandButton.innerHTML = hiddenIcon
+						} else {
+							sectionList.style.display = 'block'
+							expandButton.innerHTML = shownIcon
+						}
+					})
+				
+				sectionHeader.insertAdjacentElement('afterbegin', expandButton)
+				
+				section.appendChild(sectionHeader)
+				section.appendChild(sectionList)
+				
+				document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
+			}
+			
+			addSection(1, 'Prewire & Cable', ['1G LV NAIL ON', '1 1/2" INNER DUCT (ORG)', '1G LV RING (LV-1)'])
+			addSection(1, 'Cable Ends & Jacks', ['1G LV NAIL ON', '1 1/2" INNER DUCT (ORG)', '1G LV RING (LV-1)'])
+			addSection(2, 'Faceplate & Trimout', ['FP 1G 1P KEYSTONE', 'COAX 1X () SPLITTER'])
+			addSection(2, 'Sound, AV, & Automation', ['C641 SPEAKERS (PAIR)', 'C651 CENTER (EACH)'])
+			addSection(3, 'Alarm/Security', ['GC3 PANEL', 'DW CONTACT', 'PIR MOTION', 'GLASS BREAK'])
+			addSection(3, 'Central Vac', ['3 INLET ROUGHIN KIT (NO PIPE)', 'TUBING END CAP'])
+			addSection(4, 'Labor', ['Carlos', 'Brandon'], 'labor')
 			
 			
+			document.querySelector('.content-container').style.display = 'none'
+			function authShow () {
+				document.querySelector('.auth-container').style.display = 'none'
+				document.querySelector('.content-container').style.display = 'flex'
+			}
 		</script>
 	</body>
 </html>
