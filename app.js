@@ -72,7 +72,7 @@ const APP = {
 			})
 		}
 		else if (dataObj.name == 'Labor') {
-			
+			DRAW.addSection(4,dataObj.name,dataObj.data,'labor')
 		}
 	}
 }
@@ -175,6 +175,7 @@ const DRAW = {
 				{name:'min',value:'0'},
 				{name:'class',value:'qty'},
 				{name:'id',value:'qty-'+(x.name)},
+				{name:'onclick',value:'select()'},
 				{name:'placeholder',value:placeholderText}])
 			let itemP = document.createElement('p')
 			itemP.innerText = x.name
@@ -185,7 +186,7 @@ const DRAW = {
 			item.appendChild(itemLi)
 			
 			itemInput.addEventListener('blur', () => {
-				console.log(itemInput.value)
+				x.qty = itemInput.value
 			})
 			
 			sectionList.appendChild(item)
@@ -233,7 +234,8 @@ class RATE {
 		this.regWage = regWage
 		this.otWage = otWage
 		this.id = id
-		this.hours = hours
+		this.qty = hours
+		this.unit = 'hrs'
 	}
 }
 const DATA = {
