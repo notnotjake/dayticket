@@ -4,47 +4,76 @@ const APP = {
 		DRAW.setDatePicker()
 		
 		if ( DATA.key.isValid() ) {
-			APP.getData()
+			APP.getData([DATA.materials,DATA.labor])
 		} else {
 			DRAW.auth()
 		}
 	},
-	getData: function () {
+	getData: function (dataObjList) {
 		let helpText = ''
-		const reqURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' + encodeURI(dataObj.at)
-		console.log("Trying to get " + dataObj.name + " at URL " + reqURL)
-		const reqPromise = fetch(reqURL, {
-			method: "GET",
-			withCredentials: true,
-			headers: {
-				"Authorization": `Bearer ${DATA.key('apiKey')}`
-			}
-		})	
-		reqPromise
-			.then(response => {
-				if (response.status == 401) {
-					helpText = 'Key Rejected'
-					throw Error("Authentication Error")
-				} else if (response.status == 404) {
-					helpText = 'Couldn\'t Connect to Server'
-					throw Error("Record Not Found")
-				} else if (!response.ok) {
-					helpText = 'Something Went Wrong'
-					throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
-				} else {
-					return response.json()
+		let firstTime = true
+				
+		dataObjList.forEach( (dataObj) => {
+			const reqURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' + encodeURI(dataObj.at)
+			console.log("Trying to get " + dataObj.name + " at URL: " + reqURL)
+			const reqPromise = fetch(reqURL, {
+				method: "GET",
+				withCredentials: true,
+				headers: {
+					"Authorization": `Bearer ${DATA.key.value()}`
 				}
 			})
-			.then(responseData => {
-				DATA.key.renew(30)
-				dataObj.data = responseData.records
-				APP.useData(responseData.records, dataObj)
+			reqPromise
+				.then(response => {
+					if (response.status == 401) {
+						helpText = 'Key Rejected'
+						throw Error("Authentication Error")
+					} else if (response.status == 404) {
+						helpText = 'Couldn\'t Connect to Server'
+						throw Error("Record Not Found")
+					} else if (!response.ok) {
+						helpText = 'Something Went Wrong'
+						throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
+					} else {
+						return response.json()
+					}
+				})
+				.then(responseData => {
+					dataObj.parseData(responseData.records)
+					console.log(dataObj.name + ' Data Retrieved Successfully:')
+					console.log(dataObj.data)
+					APP.renderData(dataObj)
+					
+					if (firstTime) {
+						DATA.key.renew(30)
+						firstTime = false
+					}
+				})
+				.catch(err => {
+					if (firstTime) {
+						DRAW.auth()
+						DRAW.auth(helpText)
+						firstTime = false
+					}
+					console.log(err)
+				})
+		})
+	},
+	renderData: function (dataObj) {
+		if (dataObj.name == 'Materials') {
+			dataObj.sections.forEach( x => {
+				let sectionData = []
+				dataObj.data.forEach( i => {
+					if (i.section == x[0]) {
+						sectionData.push(i)
+					}
+				})
+				DRAW.addSection(x[1], x[0], sectionData)
 			})
-			.catch(err => {
-				DRAW.auth()
-				DRAW.auth(helpText)
-				console.log(err)
-			})
+		}
+		else if (dataObj.name == 'Labor') {
+			
+		}
 	}
 }
 
@@ -106,7 +135,7 @@ const DRAW = {
 				DATA.bakeCookies(DATA.key.name, input.value, 30)
 				if ( DATA.key.isValid() ) {
 					document.querySelector('.auth-container').remove()
-					APP.getData()
+					APP.getData([DATA.materials,DATA.labor])
 				}
 				else {
 					DRAW.auth('Key Invalid')
@@ -125,19 +154,87 @@ const DRAW = {
 			document.querySelector('#auth-help').innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>' + condition
 		}
 		document.querySelector('#new-auth-key').select()
+	},
+	addSection: function (column, name, data, headerClass) {
+		let section = DRAW.elementFactory('div',[{name:'class',value:'section-table'}])
+		
+		let sectionList = document.createElement('ul')
+		data.forEach( x => {
+			let item = document.createElement('label')
+			item.innerHTML = `
+				<li>
+					<div class="input-wrapper"><input type="numeric" min="0" class="qty" id="qty-${x.name}"/></div>
+					<p>${x.name}</p>
+				</li>`
+			sectionList.appendChild(item)
+		})
+		
+		let sectionHeader = document.createElement('h1')
+			sectionHeader.innerText = name
+			sectionHeader.classList.add(headerClass)
+		
+		let expandButton = document.createElement('button')
+			sectionList.style.display = 'block'
+			expandButton.innerHTML = shownIcon
+			expandButton.addEventListener('click', () => {
+				if (sectionList.style.display == 'block') {
+					sectionList.style.display = 'none'
+					expandButton.innerHTML = hiddenIcon
+				} else {
+					sectionList.style.display = 'block'
+					expandButton.innerHTML = shownIcon
+				}
+			})
+		
+		sectionHeader.insertAdjacentElement('afterbegin', expandButton)
+		
+		section.appendChild(sectionHeader)
+		section.appendChild(sectionList)
+		
+		document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
 	}
 }
 
+class ITEM {
+	constructor(name, cost, unit, id, section, qty) {
+		this.name = name
+		this.cost = cost
+		this.unit = unit
+		this.id = id
+		this.section = section
+		this.qty = qty
+	}
+}
+class RATE {
+	constructor(name, regWage, otWage, id, hours) {
+		this.name = name
+		this.regWage = regWage
+		this.otWage = otWage
+		this.id = id
+		this.hours = hours
+	}
+}
 const DATA = {
 	materials: {
 		name: 'Materials',
 		at: 'Materials?view=Sorted',
-		data: []
+		data: [],
+		parseData: function (data) {
+			data.forEach( i => {
+				DATA.materials.data.push(new ITEM(i.fields.name, i.fields.cost, i.fields.unit, i.id, i.fields.section, null))
+			})
+		},
+		sections: [['Prewire & Cable', 1],['Cable Ends & Jacks', 1],['Faceplate & Trimout', 2],['Sound, AV, & Automation', 2],['Alarm/Security', 3],['Central Vac', 3]]
 	},
 	labor: {
 		name: 'Labor',
 		at: 'Labor',
-		data: []
+		data: [],
+		parseData: function (data) {
+			data.forEach( i => {
+				DATA.labor.data.push(new RATE(i.fields.name, i.fields.regular, i.fields.overtime))
+			})
+		}
 	},
 	freshCookies: function () {
 		return document.cookie
