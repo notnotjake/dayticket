@@ -41,7 +41,7 @@ const APP = {
 				.then(responseData => {
 					dataObj.parseData(responseData.records)
 					console.log(dataObj.name + ' Data Retrieved Successfully:')
-					console.log(dataObj.data)
+					//console.log(dataObj.data)
 					APP.renderData(dataObj)
 					
 					if (firstTime) {
@@ -237,6 +237,15 @@ class RATE {
 	}
 }
 const DATA = {
+	form: {
+		name: 'Form',
+		data: {
+			date: 'today',
+			builder: 'Lifestyle',
+			lot: '12B',
+			billing: '$400'
+		}
+	},
 	materials: {
 		name: 'Materials',
 		at: 'Materials?view=Sorted',
@@ -299,11 +308,6 @@ const DATA = {
 
 
 
-
-
-
-
-
 // billing input
 let input = document.querySelector('#billing')
 
@@ -360,60 +364,5 @@ input.addEventListener('blur', () => {
 // sections
 let shownIcon = '<i class="bi bi-caret-down-fill"></i>'
 let hiddenIcon = '<i class="bi bi-caret-right-fill"></i>'
-
-function addSection (column, name, data, headerClass) {
-	
-	let section = document.createElement('div')
-		section.classList.add('section-table')
-	
-	let sectionList = document.createElement('ul')
-	data.forEach( (x) => {
-		let item = document.createElement('label')
-		item.innerHTML = `
-			<li>
-				<div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div>
-				<p>${x}</p>
-			</li>`
-		sectionList.appendChild(item)
-	})
-	
-	let sectionHeader = document.createElement('h1')
-		sectionHeader.innerText = name
-		sectionHeader.classList.add(headerClass)
-	
-	let expandButton = document.createElement('button')
-		sectionList.style.display = 'block'
-		expandButton.innerHTML = shownIcon
-		expandButton.addEventListener('click', () => {
-			if (sectionList.style.display == 'block') {
-				sectionList.style.display = 'none'
-				expandButton.innerHTML = hiddenIcon
-			} else {
-				sectionList.style.display = 'block'
-				expandButton.innerHTML = shownIcon
-			}
-		})
-	
-	sectionHeader.insertAdjacentElement('afterbegin', expandButton)
-	
-	section.appendChild(sectionHeader)
-	section.appendChild(sectionList)
-	
-	document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
-}
-
-function renderSections () {
-	addSection(1, 'Prewire & Cable', ['1G LV NAIL ON', '1 1/2" INNER DUCT (ORG)', '1G LV RING (LV-1)'])
-	addSection(1, 'Cable Ends & Jacks', ['1G LV NAIL ON', '1 1/2" INNER DUCT (ORG)', '1G LV RING (LV-1)'])
-	addSection(2, 'Faceplate & Trimout', ['FP 1G 1P KEYSTONE', 'COAX 1X () SPLITTER'])
-	addSection(2, 'Sound, AV, & Automation', ['C641 SPEAKERS (PAIR)', 'C651 CENTER (EACH)'])
-	addSection(3, 'Alarm/Security', ['GC3 PANEL', 'DW CONTACT', 'PIR MOTION', 'GLASS BREAK'])
-	addSection(3, 'Central Vac', ['3 INLET ROUGHIN KIT (NO PIPE)', 'TUBING END CAP'])
-	addSection(4, 'Labor', ['Carlos', 'Brandon'], 'labor')
-}
-
-
-
-
 
 APP.init()
