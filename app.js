@@ -3,17 +3,14 @@ const APP = {
 		DRAW.removeJSMessage()
 		DRAW.setDatePicker()
 		
-		if ( DATA.keyValidation('apiKey').isValid ) {
-			APP.getDataTest()
+		if ( DATA.key.isValid() ) {
+			APP.getData()
 		} else {
-			DRAW.auth('')
+			DRAW.auth()
 		}
 	},
-	getDataTest: function () {
-		DRAW.auth('<i class="bi bi-exclamation-circle-fill"></i>Key Was Rejected')
-		//renderSections()
-	},
-	getData: function (dataObj) {
+	getData: function () {
+		let helpText = ''
 		const reqURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' + encodeURI(dataObj.at)
 		console.log("Trying to get " + dataObj.name + " at URL " + reqURL)
 		const reqPromise = fetch(reqURL, {
@@ -26,26 +23,26 @@ const APP = {
 		reqPromise
 			.then(response => {
 				if (response.status == 401) {
-					DATA.connectionStatus = 'Invalid Key'
+					helpText = 'Key Rejected'
 					throw Error("Authentication Error")
 				} else if (response.status == 404) {
-					DATA.connectionStatus = 'Connection to Server Failed'
+					helpText = 'Couldn\'t Connect to Server'
 					throw Error("Record Not Found")
 				} else if (!response.ok) {
-					DATA.connectionStatus = 'Something Went Wrong'
+					helpText = 'Something Went Wrong'
 					throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
 				} else {
-					DATA.connectionStatus = 'connected'
-					DRAW.updateToolbar()
 					return response.json()
 				}
 			})
 			.then(responseData => {
+				DATA.key.renew(30)
 				dataObj.data = responseData.records
 				APP.useData(responseData.records, dataObj)
 			})
 			.catch(err => {
-				DRAW.updateToolbar()
+				DRAW.auth()
+				DRAW.auth(helpText)
 				console.log(err)
 			})
 	}
@@ -67,59 +64,80 @@ const DRAW = {
 		var date = new Date()
 		dateField.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0)
 	},
+	toolbarEnabled: function (state) {
+		if (state) {
+			console.log('should be enabled now')
+		} else {
+			console.log('should be disabled')
+		}
+	},
 	auth: function (condition) {
-		let authForm = DRAW.elementFactory('div',[{name:'class',value:'auth-container'}])
-		
-		authForm.innerHTML = '<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>'
-		let form = DRAW.elementFactory('div',[{name:'class',value:'new-auth'}])
-		let input = DRAW.elementFactory('input',[
-			{name:'type',value:'text'},
-			{name:'id',value:'new-auth-key'},
-			{name:'placeholder',value:'Security Key'},
-			{name:'autofocus',value:'true'},
-			{name:'required',value:'true'}
-			])
-		let button = DRAW.elementFactory('button',[
-			{name:'id',value:'new-auth-enroll'},
-			{name:'disabled',value:'true'},
-			])
-			button.innerHTML = '<i class="bi bi-arrow-right-circle-fill"></i>'
-		
-		form.appendChild(input)
-		form.appendChild(button)
-		authForm.appendChild(form)
-		
-		let authHelp = document.createElement('p')
-			authHelp.id = 'auth-help'
-			authHelp.innerHTML = condition
-		authForm.appendChild(authHelp)
-					
-		document.querySelector('.app-controls').insertAdjacentElement('afterbegin', authForm)
-		
-		//activate button when input is not blank
-		input.addEventListener('input', () => {
-			if ( input.value != '' ) { button.disabled = false }
-			else { button.disabled = true }
-		})
-		
-		//give the button a job
-		button.addEventListener('click', () => {
-			console.log('button was clicked')
-			if ( input.value.length < 10 ) {
-				authHelp.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>Invalid Key'
-			} else {
-				//really, should only do this after connected so we dont save a bad one
-				DATA.bakeCookies('apiKey', input.value, 30)
-				APP.getDataTest()
-			}
-		})
+		if (typeof condition == 'undefined') {
+			let authForm = DRAW.elementFactory('div',[{name:'class',value:'auth-container'}])
+			
+			authForm.innerHTML = '<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>'
+			let form = DRAW.elementFactory('div',[{name:'class',value:'new-auth'}])
+			let input = DRAW.elementFactory('input',[
+				{name:'type',value:'text'},
+				{name:'id',value:'new-auth-key'},
+				{name:'placeholder',value:'Security Key'},
+				{name:'autofocus',value:'true'},
+				{name:'required',value:'true'},
+				{name:'onclick',value:'select()'}
+				])
+			input.value = DATA.key.value()
+			let button = DRAW.elementFactory('button',[
+				{name:'id',value:'new-auth-enroll'},
+				{name:'disabled',value:'true'},
+				])
+				button.innerHTML = '<i class="bi bi-arrow-right-circle-fill"></i>'
+			//activate button when input is not empty
+			input.addEventListener('input', () => {
+				document.querySelector('#auth-help').innerHTML = ''
+				if ( input.value != '' ) {
+					button.disabled = false
+				}
+				else {
+					button.disabled = true
+				}
+			})
+			//button enrolls key
+			button.addEventListener('click', () => {
+				DATA.bakeCookies(DATA.key.name, input.value, 30)
+				if ( DATA.key.isValid() ) {
+					document.querySelector('.auth-container').remove()
+					APP.getData()
+				}
+				else {
+					DRAW.auth('Key Invalid')
+				}
+			})
+			
+			form.appendChild(input)
+			form.appendChild(button)
+			authForm.appendChild(form)
+			authForm.appendChild(DRAW.elementFactory('p',[{name:'id',value:'auth-help'}]))
+						
+			document.querySelector('.app-controls').insertAdjacentElement('afterbegin', authForm)
+		}
+		else {
+			document.querySelector('#new-auth-key').value = DATA.key.value()
+			document.querySelector('#auth-help').innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>' + condition
+		}
+		document.querySelector('#new-auth-key').select()
 	}
 }
 
 const DATA = {
 	materials: {
 		name: 'Materials',
-		at: 'Materials?view=Sorted'
+		at: 'Materials?view=Sorted',
+		data: []
+	},
+	labor: {
+		name: 'Labor',
+		at: 'Labor',
+		data: []
 	},
 	freshCookies: function () {
 		return document.cookie
@@ -130,45 +148,38 @@ const DATA = {
 		var expires = 'expires='+date.toUTCString()
 		document.cookie = key + '=' + value + ';' + expires + ';'
 		
-		console.log(key + " was set to: " + value)
+		console.log('API Key Set (' + value + ')')
 	},
-	key: function (key) {
-		let end = DATA.freshCookies().length
-		let i = DATA.freshCookies().indexOf(';', DATA.freshCookies().indexOf(key + '='))
-		if ( i >= 0 ) { end = i }
-		
-		return DATA.freshCookies().slice(DATA.freshCookies().indexOf(key + '=') + key.length + 1, end)
-	},
-	keyValidation: function (key) {
-		if ( typeof DATA.freshCookies() == 'undefined' || DATA.freshCookies == '' || !DATA.freshCookies().includes(key) ) {
-			console.log('API Key Doesn\'t Exist - There Are No Cookies')
-			return {
-				isValid: false,
-				helpHTML: '<i class="bi bi-exclamation-circle-fill"></i>Key is Required',
+	key: {
+		name: 'apiKey',
+		value: function () {
+			let end = DATA.freshCookies().length
+			let i = DATA.freshCookies().indexOf(';', DATA.freshCookies().indexOf(DATA.key.name + '='))
+			if ( i >= 0 ) { end = i }
+			
+			return DATA.freshCookies().slice(DATA.freshCookies().indexOf(DATA.key.name + '=') + DATA.key.name.length + 1, end)
+		},
+		isValid: function () {
+			if ( typeof DATA.freshCookies() == 'undefined' || DATA.freshCookies == '' || !DATA.freshCookies().includes(DATA.key.name) || DATA.key.value() == '') {
+				console.log('API Key Doesn\'t Exist')
+				return false
+			} else if (DATA.key.value().length < 10 ) {
+				console.log('API Key is Too Short')
+				return false
+			} else {
+				return true
 			}
-		} 
-		else if ( DATA.key(key) == '' || DATA.key(key) == 'null') {
-			console.log('API Key is Empty')
-			return {
-				isValid: false,
-				helpHTML: '<i class="bi bi-exclamation-circle-fill"></i>Key is Required',
-			}
-		}
-		else if ( DATA.key(key).length < 10 ) {
-			console.log('API Key is Too Short')
-			return {
-				isValid: false,
-				helpHTML: '<i class="bi bi-exclamation-circle-fill"></i>Invalid Key',
-			}
-		} else {
-			console.log('API Key (' + DATA.key(key) + ') Appears Valid. Will Try to Connect...')
-			return {
-				isValid: true,
-				helpHTML: ''
-			}
+		},
+		renew: function (days) {
+			let keyValue = DATA.key.value()
+			DATA.bakeCookies(DATA.key.name, keyValue, days)
+			console.log('API Key Cookie Extended for 30 Days')
 		}
 	}
 }
+
+
+
 
 
 
