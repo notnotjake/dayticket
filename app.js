@@ -1,67 +1,26 @@
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// * * Overview  * * * * * * * * * * * * * * * * * * * * * * 
-// APP - handles the flow of the page
-// DRAW - handles changes that the user sees
-// DATA - handles anything related to airtable, cookies, and data
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// * * Set Variables * * * * * * * * * * * * * * * * * * * *
-const airtableURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' //the URL of the airtable project
-const materialsAT = 'Materials?view=Sorted'
-const laborAT = 'Labor'
-const materialsSections = [ ['Prewire & Cable', 1], ['Cable Ends & Jacks', 1], ['Faceplate & Trimout', 2], ['Sound, AV, & Automation', 2], ['Alarm/Security', 3], ['Central Vac', 3] ]
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-// ## Define an 'Item' for Materials data object
-class ITEM {
-	constructor(name, cost, unit, id, section, qty) {
-		this.name = name
-		this.cost = cost
-		this.unit = unit
-		this.id = id
-		this.section = section
-		this.qty = qty
-	}
-}
-// ## Define a 'Laborer' for Labor data object
-class RATE {
-	constructor(name, regWage, otWage, id, hours) {
-		this.name = name
-		this.regWage = regWage
-		this.otWage = otWage
-		this.id = id
-		this.hours = hours
-	}
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// ## APP
-// Responsible for main controlling of the page
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const APP = {
-	init: function (url) {
-		DRAW.removeJSDisabledMessage()
-		APP.goGetData()
-	},
-	goGetData: function () {
-		if ( DATA.isKeyValid() ) {
-			APP.getData(DATA.materials)
-			APP.getData(DATA.labor)
+	init: function () {
+		DRAW.removeJSMessage()
+		DRAW.setDatePicker()
+		
+		if ( DATA.keyValidation('apiKey').isValid ) {
+			APP.getDataTest()
 		} else {
-			DRAW.updateToolbar()
+			DRAW.auth('')
 		}
 	},
-	
-	// tries to get data for data object passed to it
-	// on success, updates toolbar and then proceeds to APP.useData
-	// on fail, updates the toolbar
+	getDataTest: function () {
+		DRAW.auth('<i class="bi bi-exclamation-circle-fill"></i>Key Was Rejected')
+		//renderSections()
+	},
 	getData: function (dataObj) {
-		const reqURL = `${airtableURL}${encodeURI(dataObj.AT)}`
+		const reqURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' + encodeURI(dataObj.at)
 		console.log("Trying to get " + dataObj.name + " at URL " + reqURL)
 		const reqPromise = fetch(reqURL, {
 			method: "GET",
 			withCredentials: true,
 			headers: {
-				"Authorization": `Bearer ${DATA.key}`
+				"Authorization": `Bearer ${DATA.key('apiKey')}`
 			}
 		})	
 		reqPromise
@@ -89,467 +48,240 @@ const APP = {
 				DRAW.updateToolbar()
 				console.log(err)
 			})
-	},
-	useData: function (data, dataObj) {
-		console.log(dataObj.name + " Data Retrieved Successfully:")
-		dataObj.parseData()
-		console.log(dataObj.data)
-		DRAW.table(dataObj)
-		DATA.formListener(dataObj)
-	},
-	print: function () {
-		console.log('print')
-		var printWindow = window.open("")
-		printWindow.document.write(DRAW.printingPress())
-		printWindow.stop()
-		printWindow.print()
-		printWindow.close()
-	},
-	export: function () {
-		console.log('export')
-		
-		download('test.txt', 'hello world')
-		
-		function download(filename, contents) {
-			var element = document.createElement('a')
-			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('Hello World'))
-			element.setAttribute('download', filename)
-			
-			element.style.display = 'none'
-			document.body.appendChild(element)
-			
-			element.click()
-			
-			document.body.removeChild(element)
-		}
-		
-	},
-	clearButton: function () {
-		document.querySelectorAll('input').forEach( (x) => {
-			x.value = ''
-		})
-		DRAW.setDatePicker()
-	},
+	}
 }
 
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// ## DRAW
-// Responsible for changing things on screen
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const DRAW = {
-	table: function(dataObj) {
-		if (dataObj.name == 'materials') {
-			let htmlContent = ''
-			
-			let column1 = ''
-			let column2 = ''
-			let column3 = ''
-			
-			DATA.materials.sections.forEach( (i) => {
-				let sectionTable = `
-					<table class='materials-table'>
-						<tr><td colspan='2' class='table-header'>${i[0]}</td></tr>
-					`
-				DATA.materials.data.forEach( (x) => {
-					if (x.section == i[0]) {
-						let placeholder = () => { if (x.unit != 'whole') { return x.unit } else { return ''} }
-						sectionTable += `
-						<tr class='table-rows'>
-							<td class='qty input'><input type='number' min='1' id='qtyOf-${x.id}' placeholder='${placeholder()}'></td>
-							<td class='item-name'><label for='qtyOf-${x.id}'>${x.name}</label></td>
-						</tr>
-						`
-					}
-				})
-				
-				sectionTable += `</table>`
-				
-				if (i[1] == 1) {
-					column1 += sectionTable
-				} else if (i[1] == 2) {
-					column2 += sectionTable
-				} else if (i[1] == 3) {
-					column3 += sectionTable
-				}			
-				
-			})
-			
-			document.querySelector(`#column-1`).innerHTML = column1
-			document.querySelector(`#column-2`).innerHTML = column2
-			document.querySelector(`#column-3`).innerHTML = column3
-
-		}
-		else if (dataObj.name == 'labor') {
-			let htmlRender = `
-				<table class='labor-table'>
-					<tr><td colspan='2' class='table-header labor'>Labor</td></tr>
-				`
-			DATA.labor.data.forEach( (i) => {
-				htmlRender += `
-					<tr class='table-rows'>
-						<td class='input hrs'><input type='number' min='0.25' id='hrsOf-${i.name}' placeholder='hrs'></td>
-						<td class='labor-name'><label for='hrsOf-${i.name}'>${i.name}</label></td>
-					</tr>
-					`
-			})
-			document.querySelector('#column-4').innerHTML = htmlRender
-		}
+	elementFactory: function (elem, attr) {
+		let objectNode = document.createElement(elem)
+		attr.forEach( (x) => {
+			objectNode.setAttribute(x.name, x.value)
+		})
+		return objectNode
 	},
-	
+	removeJSMessage: function () {
+		document.querySelector('.js-message').remove()
+	},
 	setDatePicker: function () {
 		var dateField = document.querySelector('#date')
 		var date = new Date()
 		dateField.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0)
 	},
-	removeJSDisabledMessage: function () {
-		document.querySelector('#js-enabled').style.display = 'none'
-	},
-	updateToolbar: function () {
-		if (DATA.connectionStatus == 'connected') {
-			DRAW.setToolbarActive()
-		} else {
-			DRAW.setToolbarAuth()
-		}
-	},
-	
-	authFirstTry: true,
-	setToolbarAuth: function () {
-		if (DRAW.authFirstTry) {
-			document.querySelector('.error-hint').style.display = 'none'
-			DRAW.authFirstTry = false
-		} else {
-			document.querySelector('.error-hint').style.display = 'flex';
-			document.querySelector('#error-hint-text').innerHTML = DATA.connectionStatus;
-		}
-		document.querySelector('#toolbar').innerHTML = `
-			<form class="auth">
-				<label for="auth-key">&nbsp Key</label>
-				<input class="input" type="text" id="api-key" name="api-key" placeholder="Enter Security Key to Connect"/>
-				<div id="auth-button">
-					<button>Enroll</button>
-				</div>
-			</form>
-			`
-		document.querySelector('#api-key').value = DATA.key
-		document.querySelector('#api-key').focus()
+	auth: function (condition) {
+		let authForm = DRAW.elementFactory('div',[{name:'class',value:'auth-container'}])
 		
-		document.querySelector('#auth-button').addEventListener('click', () => {
-			DATA.bakeCookies(document.querySelector('#api-key').value)
-			APP.goGetData()
+		authForm.innerHTML = '<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>'
+		let form = DRAW.elementFactory('div',[{name:'class',value:'new-auth'}])
+		let input = DRAW.elementFactory('input',[
+			{name:'type',value:'text'},
+			{name:'id',value:'new-auth-key'},
+			{name:'placeholder',value:'Security Key'},
+			{name:'autofocus',value:'true'},
+			{name:'required',value:'true'}
+			])
+		let button = DRAW.elementFactory('button',[
+			{name:'id',value:'new-auth-enroll'},
+			{name:'disabled',value:'true'},
+			])
+			button.innerHTML = '<i class="bi bi-arrow-right-circle-fill"></i>'
+		
+		form.appendChild(input)
+		form.appendChild(button)
+		authForm.appendChild(form)
+		
+		let authHelp = document.createElement('p')
+			authHelp.id = 'auth-help'
+			authHelp.innerHTML = condition
+		authForm.appendChild(authHelp)
+					
+		document.querySelector('.app-controls').insertAdjacentElement('afterbegin', authForm)
+		
+		//activate button when input is not blank
+		input.addEventListener('input', () => {
+			if ( input.value != '' ) { button.disabled = false }
+			else { button.disabled = true }
 		})
-	},
-	setToolbarActive: function () {
-		document.querySelector('#toolbar').innerHTML = `
-			<form class="form-wrapper toolbar-actions">
-				<input type="date" id="date" name="ticket-date" value="2021-01-01" min="2021-01-01" max="2050-12-31">
-				<input type="text" id="builder-name" name="builder-name" placeholder="Builder">
-				<input  type="text" id="lot-block" name="lot-block" placeholder="Lot & Block">
-				<input type="number" id="bill" name="bill" placeholder="Bill Ammount">
-			</form>
-			
-			<div id="toolbar-functions" class="toolbar-actions">
-				<div id="connection-status" class="status-wrapper toolbar-actions">
-					<div id="connection-status-button">
-						<p id="connection-status-description" class="on-auth-hide">Valid Key:&nbsp<span id="shown-key">${DATA.key}</span></p>
-						<button id="connection-status-icon" title="You're connected" class="on-auth-hide"><i class="bi bi-cloud-check-fill""></i></button>
-					</div>
-				</div>
-			
-				<div id="actions-group" class="actions-wrapper toolbar-actions">
-					<div id="merged-left">
-						<button onclick="APP.print()" id="printButton"><i class="bi bi-printer-fill"></i>&nbsp Print</button>
-					</div>
-					<div id="merged-right">
-						<button onclick="APP.export()" id="exportButton"><i class="bi bi-file-earmark-spreadsheet-fill"></i>&nbsp Export</button>
-					</div>
-					<div>
-					<button onclick="APP.clearButton()" id="clearButton">Clear</button>
-					</div>
-				</div>
-			</div>
-			`		
-		document.querySelector('#toolbar').style.justifyContent = 'space-between'
-		document.querySelector('#toolbar').style.backgroundColor = '#f8f3dd'
-		document.querySelector('#toolbar').style.borderBottom = '1.5px solid #E7E3CF'
-		document.querySelector('#toolbar').style.borderTop = '1.5px solid #E7E3CF'
-		document.querySelector('.error-hint').style.display = 'none'
 		
-		DRAW.setDatePicker()
-		
-		document.querySelector('#connection-status').addEventListener('mouseover', () => {
-			document.querySelector('#connection-status-description').style.display = 'flex'
-			console.log('hover event')
+		//give the button a job
+		button.addEventListener('click', () => {
+			console.log('button was clicked')
+			if ( input.value.length < 10 ) {
+				authHelp.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>Invalid Key'
+			} else {
+				//really, should only do this after connected so we dont save a bad one
+				DATA.bakeCookies('apiKey', input.value, 30)
+				APP.getDataTest()
+			}
 		})
-		document.querySelector('#connection-status').addEventListener('mouseout', () => {
-			document.querySelector('#connection-status-description').style.display = 'none'
-		})
-	},
-	
-	printingPress: function () {
-		let inputDate = document.querySelector('#date').value
-		let inputBuilder = document.querySelector('#builder-name').value
-		let inputLot = document.querySelector('#lot-block').value
-		let inputBill = document.querySelector('#bill').value
-		
-		let materialsCost = 0
-		
-		function printMaterialsList () {
-			let materialsList = ``
-			DATA.materials.data.forEach( (x) => {
-				if (x.qty > 0) {
-					materialsList += `
-					<tr><td>${x.name}</td><td>${x.qty}</td><td>$${(x.cost) * (x.qty)}</td></tr>`
-					materialsCost += x.qty * x.cost
-				}
-			})
-			return materialsList
-		}
-		
-		printMaterialsList()
-		
-		return `
-		<html lang="en">
-			<head>
-				<meta charset="utf-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-				<style>
-					@import url('https://rsms.me/inter/inter.css');
-					html { font-family: 'Inter', sans-serif; }
-					@supports (font-variation-settings: normal) {
-					  html { font-family: 'Inter var', sans-serif; }
-					}
-					body {
-						-webkit-print-color-adjust: exact !important;
-						color-adjust: exact !important;
-					}
-					.container {
-						width: 5in;
-						margin: 8pt auto;
-					}
-					.header {
-						display: grid;
-						grid-template-columns: 20% 20% 60%;
-						margin-bottom: 8pt;
-					}
-					.header h3 {
-						font-size: 10pt;
-						font-weight: 500;
-						color: #3a3a3a;
-						margin: 0;
-					}
-					.header p {
-						font-size: 12pt;
-						font-weight: 600;
-						color: black;
-						margin: 0;
-					}		
-					table {
-						width: 100%;
-						margin-bottom: 6pt;
-						border-collapse: collapse;
-						font-size: 10pt;
-					}
-					table * {
-						padding-left: 3pt;
-						padding-right: 3pt;
-					}
-					.col1 {
-						width: 3.25in;
-					}
-					td:nth-child(3) {
-						text-align: right;
-					}
-					.heading {
-						background-color: #1f1f1f;
-						color: white;
-						font-weight: 700;
-						font-size: 11pt;
-					}
-					.heading td {
-						padding: 4pt 3pt 2pt;
-					}
-					.subheading {
-						background-color: #dcdcdc;
-						border-bottom: 1px solid #adadad;
-						font-weight: 600;
-						font-size: 10pt;
-					}
-					.subheading td {
-						padding: 2pt 3pt 1pt;
-					}
-					.total-line {
-						border-top: 2px solid #636363;
-					}
-					.total-line td {
-						padding: 2pt 3pt;
-					}
-					.total-line b {
-						padding: 0;
-					}
-				</style>
-			</head>
-			<body>
-				<div class="container">
-					<div class="header">
-						<div>
-							<h3>Builder</h3>
-							<p>${inputBuilder}</p>
-						</div>
-						<div>
-							<h3>Lot & Block</h3>
-							<p>${inputLot}</p>
-						</div>
-						<div>
-							<h3>Date</h3>
-							<p>${inputDate}</p>
-						</div>
-					</div>
-					<table>
-						<tr class="heading"><td colspan='3'>Report Summary</td></tr>
-						<tr class="subheading"><td>Billing</td><td></td><td>$${inputBill}</td></tr>
-						<tr><td class="col1">Labor</td><td></td><td>$300</td></tr>
-						<tr><td>Materials (Incl 6% Sales Tax)</td><td></td><td>$${materialsCost}</td></tr>
-						<tr class="total-line"><td><b>Total Cost</b></td><td></td><td><b>$610.03</b></td></tr>
-						<tr class="total-line"><td><b>Gross Profit</b></td><td>13.4%</td><td><b>$210.05<b></td></tr>
-					</table>
-					<table>
-						<tr class="heading"><td colspan='3'>Labor Cost</td></tr>
-						<tr class="subheading"><td>Labor</td><td>Hours</td><td>Total Cost</td></tr>
-						<tr><td class="col1">Helper ($20/hr)</td><td>3.00</td><td>$60.00</td></tr>
-					</table>	
-					<table>
-						<tr class="heading"><td colspan='3'>Materials Cost</td></tr>
-						<tr class="subheading"><td class="col1">Product</td><td>Qty</td><td>Total Cost</td></tr>
-						${printMaterialsList()}
-					</table>
-				</div>
-			</body>
-		</html>
-		`
 	}
 }
 
-
-
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// ## DATA
-// Responsible for taking care of the data and connecting with AirTable
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const DATA = {
 	materials: {
-		name: 'materials',
-		AT: materialsAT,
-		data: [],
-		sections: materialsSections,
-		parseData: function () {
-			let dataReturned = []
-			DATA.materials.data.forEach((i) => {
-				// ITEM arguments: name, cost, unit, id, section, qty
-				let iRecord = new ITEM(i.fields.name, i.fields.cost, i.fields.unit, i.id, i.fields.section, null)
-				dataReturned.push(iRecord)
-			})
-			DATA.materials.data = dataReturned
-			
-			return DATA.materials.data
-		},
-		// not used, opting to manually enter
-		getSections: function () {
-			DATA.materials.data.forEach( (i) => {
-				DATA.materials.sections.push(i.section)
-			})			
-			
-			let unique = []
-			unique = DATA.materials.sections.filter((value, index, self) => {
-				return self.indexOf(value) === index
-			})
-			DATA.materials.sections = unique
-		}
+		name: 'Materials',
+		at: 'Materials?view=Sorted'
 	},
-	labor: {
-		name: 'labor',
-		AT: laborAT,
-		data: [],
-		parseData: function () {
-			let dataReturned = []
-			DATA.labor.data.forEach((i) => {
-				// RATE arguments: name, regWage, otWage, id, hours
-				let iRecord = new RATE(i.fields.name, i.fields.regular, i.fields.overtime)
-				dataReturned.push(iRecord)
-			})
-			DATA.labor.data = dataReturned
-			
-			return DATA.labor.data
-		}
-	},
-	
-	formListener: function () {		
-		document.querySelectorAll('input').forEach( (x) => {
-			if (x.id.includes('qtyOf-')) {
-				x.addEventListener('change', (ev) => {
-					DATA.materials.data.forEach( (i) => {
-						if (i.id == x.id.slice(6)) {
-							i.qty = x.value
-						}
-					})
-				})
-			}
-			else {
-				console.log(x.id)
-			}
-		})
-	},
-	
-	connectionStatus: "",
-	keyName: "apiKey",
-	key: '',
-	
-	cookies: document.cookie,	
 	freshCookies: function () {
-		DATA.cookies = document.cookie
-		return DATA.cookies
+		return document.cookie
 	},
-	bakeCookies: function (value) {
-		var d = new Date();
-		d.setTime(d.getTime() + (45*24*60*60*1000));
-		var expires = "expires="+ d.toUTCString();
-		document.cookie = DATA.keyName + "=" + value + ";" + expires;
-		console.log(DATA.keyName + " was set to: " + value)
+	bakeCookies: function (key, value, days) {
+		var date = new Date()
+		date.setTime(date.getTime() + (days*24*60*60*1000) )
+		var expires = 'expires='+date.toUTCString()
+		document.cookie = key + '=' + value + ';' + expires + ';'
+		
+		console.log(key + " was set to: " + value)
 	},
-	loadKey: function () {
-		let end = DATA.cookies.length
-		let i = DATA.cookies.indexOf(";", DATA.cookies.indexOf(DATA.keyName + "="))
-		if ( i >= 0 ) { end = i }		
+	key: function (key) {
+		let end = DATA.freshCookies().length
+		let i = DATA.freshCookies().indexOf(';', DATA.freshCookies().indexOf(key + '='))
+		if ( i >= 0 ) { end = i }
 		
-		DATA.key = DATA.cookies.slice(DATA.cookies.indexOf(DATA.keyName + "=") + DATA.keyName.length + 1, end)
+		return DATA.freshCookies().slice(DATA.freshCookies().indexOf(key + '=') + key.length + 1, end)
 	},
-	isKeyValid: function () {
-		DATA.freshCookies()
-		if (typeof DATA.cookies == 'undefined' || DATA.cookies == "" || !DATA.cookies.includes(DATA.keyName)) {
-			DATA.connectionStatus = 'Key is Required'
-			console.log("API Key Doesn't Exist - There Are No Cookies")
-			return false
+	keyValidation: function (key) {
+		if ( typeof DATA.freshCookies() == 'undefined' || DATA.freshCookies == '' || !DATA.freshCookies().includes(key) ) {
+			console.log('API Key Doesn\'t Exist - There Are No Cookies')
+			return {
+				isValid: false,
+				helpHTML: '<i class="bi bi-exclamation-circle-fill"></i>Key is Required',
+			}
+		} 
+		else if ( DATA.key(key) == '' || DATA.key(key) == 'null') {
+			console.log('API Key is Empty')
+			return {
+				isValid: false,
+				helpHTML: '<i class="bi bi-exclamation-circle-fill"></i>Key is Required',
+			}
 		}
-		
-		DATA.loadKey()
-		
-		if (DATA.key == "" || DATA.key == "null") {
-			DATA.connectionStatus = 'Key is Required'
-			console.log("API Key is Empty")
-			return false
-		}
-		if (DATA.key.length < 10) {
-			DATA.connectionStatus = 'Invalid Key'
-			console.log("API Key is Too Short")
-			return false
-		}
-		else {
-			console.log("API Key '" + DATA.key + "' appears valid. Will try to connect...")
-			return true
+		else if ( DATA.key(key).length < 10 ) {
+			console.log('API Key is Too Short')
+			return {
+				isValid: false,
+				helpHTML: '<i class="bi bi-exclamation-circle-fill"></i>Invalid Key',
+			}
+		} else {
+			console.log('API Key (' + DATA.key(key) + ') Appears Valid. Will Try to Connect...')
+			return {
+				isValid: true,
+				helpHTML: ''
+			}
 		}
 	}
 }
+
+
+
+
+
+// billing input
+let input = document.querySelector('#billing')
+
+let timeout = null
+input.addEventListener('keyup', () => {
+	clearTimeout(timeout)
+	timeout = setTimeout(function () {
+		//do something after delay typing
+	}, 900)
+})
+
+function mathInline (n) {
+	if (n.includes('*')) {
+		index = n.search('\\*')
+		term1 = parseFloat(n.substring(0, index) )
+		term2 = parseFloat(n.substring(index+1) )
+		n = term1 * term2
+	} else if (n.includes('/')) {
+		index = n.search('/')
+		dividend = parseFloat(n.substring(0, index) )
+		divisor = parseFloat(n.substring(index+1) )
+		n = dividend / divisor
+	} else if (n.includes('-')) {
+		index = n.search('-')
+		term1 = parseFloat(n.substring(0, index) )
+		term2 = parseFloat(n.substring(index+1) )
+		n = term1 - term2
+	} else if (n.includes('+')) {
+		index = n.search('\\+')
+		term1 = parseFloat(n.substring(0, index) )
+		term2 = parseFloat(n.substring(index+1) )
+		n = term1 + term2
+	}
+	return n
+}
+
+function currency (n) {
+	while (n.includes(',')) {
+		index = n.search(',')
+		n = n.substring(0, index) + n.substring(index+1)
+	}
+	n = mathInline(n)
+	n = parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+	return n
+}
+
+input.addEventListener('blur', () => {
+	if (input.value != '') {
+		input.value = currency(input.value)
+	}
+})
+
+
+// sections
+let shownIcon = '<i class="bi bi-caret-down-fill"></i>'
+let hiddenIcon = '<i class="bi bi-caret-right-fill"></i>'
+
+function addSection (column, name, data, headerClass) {
+	
+	let section = document.createElement('div')
+		section.classList.add('section-table')
+	
+	let sectionList = document.createElement('ul')
+	data.forEach( (x) => {
+		let item = document.createElement('label')
+		item.innerHTML = `
+			<li>
+				<div class="input-wrapper"><input type="numeric" min="0" class="qty"/></div>
+				<p>${x}</p>
+			</li>`
+		sectionList.appendChild(item)
+	})
+	
+	let sectionHeader = document.createElement('h1')
+		sectionHeader.innerText = name
+		sectionHeader.classList.add(headerClass)
+	
+	let expandButton = document.createElement('button')
+		sectionList.style.display = 'block'
+		expandButton.innerHTML = shownIcon
+		expandButton.addEventListener('click', () => {
+			if (sectionList.style.display == 'block') {
+				sectionList.style.display = 'none'
+				expandButton.innerHTML = hiddenIcon
+			} else {
+				sectionList.style.display = 'block'
+				expandButton.innerHTML = shownIcon
+			}
+		})
+	
+	sectionHeader.insertAdjacentElement('afterbegin', expandButton)
+	
+	section.appendChild(sectionHeader)
+	section.appendChild(sectionList)
+	
+	document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
+}
+
+function renderSections () {
+	addSection(1, 'Prewire & Cable', ['1G LV NAIL ON', '1 1/2" INNER DUCT (ORG)', '1G LV RING (LV-1)'])
+	addSection(1, 'Cable Ends & Jacks', ['1G LV NAIL ON', '1 1/2" INNER DUCT (ORG)', '1G LV RING (LV-1)'])
+	addSection(2, 'Faceplate & Trimout', ['FP 1G 1P KEYSTONE', 'COAX 1X () SPLITTER'])
+	addSection(2, 'Sound, AV, & Automation', ['C641 SPEAKERS (PAIR)', 'C651 CENTER (EACH)'])
+	addSection(3, 'Alarm/Security', ['GC3 PANEL', 'DW CONTACT', 'PIR MOTION', 'GLASS BREAK'])
+	addSection(3, 'Central Vac', ['3 INLET ROUGHIN KIT (NO PIPE)', 'TUBING END CAP'])
+	addSection(4, 'Labor', ['Carlos', 'Brandon'], 'labor')
+}
+
 
 
 

@@ -1,61 +1,66 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<!--Site Info-->
-		<meta charset="utf-8">
-		<title>Day Ticket Entry</title>
-		<meta name="description" content="Enter in timesheet data then print or export to QuickBooks bill">
-		<link rel="canonical" href="https://dayticket.advanceas.com/">
-		<!--Appearance-->
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-		<link rel="stylesheet" type="text/css" href="style.css">
-		<link rel="apple-touch-icon" href="https://www.advanceas.com/images/logo.png">
-		<link rel="icon" type="image/png" sizes="271x271" href="https://www.advanceas.com/images/logo.png">
-		<!-- OpenGraph -->
-		<meta property="og:title" content="Advance • Day Ticket Entry">
-		<meta property="og:site_name" content="Advance">
-		<meta property="og:url" content="https://dayticket.advnaceas.com/">
-		<meta property="og:type" content="website">
-		<meta property="og:description" content="Enter in timesheet data then print or export to QuickBooks bill">
-		<meta property="og:image" content="https://www.advanceas.com/images/logo.png">
-	</head>
-	<body>
-		
-		<div class="container">
-			<h3 id="beta-message">Beta — <a href="mailto:feedback-advancedayticket@notnotjake.com?subject=Advance DayTicket-Problem/Request: ">Send Feedback</a></h3>
-			
-			<h1 id="js-enabled" style="text-align:center;">Enable JavaScript to Load App</h1>
-			
-			<div id="toolbar">
-				<p id="status-app-loading" style=""><span style="letter-spacing:10px;"><i class="bi bi-moon-stars-fill" style="color:#786BB4;"></i></span>App Loading</p>
+<head>
+	<!--Site Info-->
+	<meta charset="utf-8">
+	<title>Dayticket</title>
+	<meta name="description" content="Enter in timesheet data then print or export to QuickBooks bill">
+	<link rel="canonical" href="https://dayticket.advanceas.com/">
+	<!--Appearance-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="apple-touch-icon" href="https://www.advanceas.com/images/logo.png">
+	<link rel="icon" type="image/png" sizes="271x271" href="https://www.advanceas.com/images/logo.png">
+	<!-- OpenGraph -->
+	<meta property="og:title" content="Advance • Day Ticket Entry">
+	<meta property="og:site_name" content="Advance">
+	<meta property="og:url" content="https://dayticket.advnaceas.com/">
+	<meta property="og:type" content="website">
+	<meta property="og:description" content="Enter in timesheet data then print or export to QuickBooks bill">
+	<meta property="og:image" content="https://www.advanceas.com/images/logo.png">
+</head>
+<body>
+	<div class="toolbar">
+		<div class="toolbar-inputs">
+			<div class="input date">
+				<input id="date" type="date" placeholder="Builder" value="2021-01-01" min="2021-01-01" max="2050-12-31"/>
 			</div>
-			
-			<div id="error-hint" class="error-hint">
-				<h2><span style="letter-spacing:10px;"><i id="error-hint-icon" class="bi bi-exclamation-diamond-fill"></i></span><span id="error-hint-text">Key is Required</span></h2>
+			<div class="input builder">
+				<input id="builder" type="text" placeholder="Builder"/>
 			</div>
-			
-			<div class="content">
-				<div class="content-wrapper">
-					<div id="column-1"></div>
-					<div id="column-2"></div>
-					<div id="column-3"></div>
-					<div id="column-4"></div>
-				</div>
+			<div class="input lot">
+				<input id="lot" type="text" placeholder="Lot"/>
 			</div>
-			
-			<footer>
-				<h1>Advance Day Ticket Entry</h1>
-				<p><a href="/help"><i class="bi bi-question-circle-fill"></i> Help</a><span id="footer-space"> </span><a href="/about"><i class="bi bi-stars"></i> About</a></p>
-				
-				<div id="snowman-footer-light" style="display: flex;align-items:center;align-self:center; border-top: 1px solid #D9CEC3; padding-top: 5px;">
-					<a href="https://www.notnotjake.com" style="text-decoration: none; display: flex;align-items:center;align-self:center;">
-						<img src="https://www.notnotjake.com/images/snowman-icon.png" style="width: 30px;" />
-						<h2 style="font-size: 15px; font-weight: 600; margin-left: 8px;">Created by Snowman Design</h2>
-					</a>
-				</div>
-			</footer>
-			
+			<div class="input billing">
+				<p>$</p>
+				<input id="billing" type="text" placeholder="Billing" onclick="select()"/>
+			</div>
 		</div>
-		<script type="text/javascript" src="app.js"></script>
-	</body>
+		<div class="toolbar-buttons">
+			<button id='print'><i class="bi bi-printer-fill"></i>Print</button>
+			<button id='export'><i class="bi bi-file-earmark-spreadsheet-fill"></i>Export</button>
+			<button id='clear'>Clear</button>
+		</div>
+	</div>
+	
+	<div class="content-container">
+		<div class="column" id="column-1"></div>
+		<div class="column" id="column-2"></div>
+		<div class="column" id="column-3"></div>
+		<div class="column" id="column-4"></div>
+	</div>
+	
+	<div class="app-controls">
+		<div class="js-message">
+			<h2><i class="bi bi-exclamation-circle-fill"></i>Enable JavaScript to Use App</h2>
+		</div>
+		
+		<div class="footer">
+			<a href="/help"><i class="bi bi-question-circle-fill"></i> Help</a>
+			<a href="/about"><i class="bi bi-stars"></i> About</a>
+		</div>
+	</div>
+	
+	<script type="text/javascript" src="app.js"></script>
+</body>
 </html>
