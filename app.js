@@ -160,12 +160,34 @@ const DRAW = {
 		
 		let sectionList = document.createElement('ul')
 		data.forEach( x => {
+			let placeholderText = ''
+			if (x.unit == 'whole') {
+				placeholderText = ''
+			} else {
+				placeholderText = x.unit
+			}
+			
 			let item = document.createElement('label')
-			item.innerHTML = `
-				<li>
-					<div class="input-wrapper"><input type="numeric" min="0" class="qty" id="qty-${x.name}"/></div>
-					<p>${x.name}</p>
-				</li>`
+			let itemLi = document.createElement('li')
+			let inputWrapper = DRAW.elementFactory('div',[{name:'class',value:'input-wrapper'}])
+			let itemInput = DRAW.elementFactory('input',[
+				{name:'type',value:'numeric'},
+				{name:'min',value:'0'},
+				{name:'class',value:'qty'},
+				{name:'id',value:'qty-'+(x.name)},
+				{name:'placeholder',value:placeholderText}])
+			let itemP = document.createElement('p')
+			itemP.innerText = x.name
+			
+			inputWrapper.appendChild(itemInput)
+			itemLi.appendChild(inputWrapper)
+			itemLi.appendChild(itemP)
+			item.appendChild(itemLi)
+			
+			itemInput.addEventListener('blur', () => {
+				console.log(itemInput.value)
+			})
+			
 			sectionList.appendChild(item)
 		})
 		
