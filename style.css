@@ -9,7 +9,7 @@ html, button, input, select, textarea {
 	}
 }
 :root {
-	--max-width: 1200px;
+	--max-width: 1250px;
 }
 body {
 	margin: 0;
@@ -186,7 +186,6 @@ i {
 	background-color: #deece9;
 }
 .section-table button {
-	margin: 0 5px 0 0;
 	padding: 0;
 	background-color: transparent;
 	border: none;
