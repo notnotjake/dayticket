@@ -217,6 +217,7 @@ const DRAW = {
 				{name:'class',value:'qty'},
 				{name:'id',value:'qty-'+(x.name)},
 				{name:'onclick',value:'select()'},
+				{name:'inputmode',value:'decimal'},
 				{name:'placeholder',value:placeholderText}])
 			let itemP = document.createElement('p')
 			itemP.innerText = x.name

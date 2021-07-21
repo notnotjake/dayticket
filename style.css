@@ -429,3 +429,21 @@ i {
 		text-align: right;
 	}
 }
+
+
+@media (max-width: 800px) {
+	.toolbar {
+		flex-direction: column;
+	}
+	.toolbar-inputs {
+		//flex-direction: column;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		width: 100%;
+	}
+	.input {
+		width: calc(50% - 2px);
+		margin-right: 0;
+		margin-bottom: 5px;
+	}
+}
