@@ -77,8 +77,10 @@ const APP = {
 		}
 	},
 	printButton: function () {
+		document.title = 'Dayticket: ' + DATA.form.builder() + ' ' + DATA.form.dateString()
 		DRAW.printingPress()
 		window.print()
+		document.title = 'Dayticket Entry'
 	},
 	exportButton: function () {
 		download('test.txt', 'hello world')
