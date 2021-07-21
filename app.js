@@ -46,6 +46,7 @@ const APP = {
 					
 					if (firstTime) {
 						DATA.key.renew(30)
+						DRAW.connectedStatus()
 						firstTime = false
 					}
 				})
@@ -74,7 +75,34 @@ const APP = {
 		else if (dataObj.name == 'Labor') {
 			DRAW.addSection(4,dataObj.name,dataObj.data,'labor')
 		}
-	}
+	},
+	printButton: function () {
+		DRAW.printingPress()
+		window.print()
+	},
+	exportButton: function () {
+		download('test.txt', 'hello world')
+		
+		function download(filename, contents) {
+			var element = document.createElement('a')
+			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('Hello World'))
+			element.setAttribute('download', filename)
+			
+			element.style.display = 'none'
+			document.body.appendChild(element)
+			
+			element.click()
+			
+			document.body.removeChild(element)
+		}
+		
+	},
+	clearButton: function () {
+		document.querySelectorAll('input').forEach( (x) => {
+			x.value = ''
+		})
+		DRAW.setDatePicker()
+	},
 }
 
 const DRAW = {
@@ -95,9 +123,9 @@ const DRAW = {
 	},
 	toolbarEnabled: function (state) {
 		if (state) {
-			console.log('should be enabled now')
+			//console.log('should be enabled now')
 		} else {
-			console.log('should be disabled')
+			//console.log('should be disabled')
 		}
 	},
 	auth: function (condition) {
@@ -155,6 +183,12 @@ const DRAW = {
 		}
 		document.querySelector('#new-auth-key').select()
 	},
+	connectedStatus: function () {
+		let connected = DRAW.elementFactory('div',[{name:'class',value:'app-status'}])
+		connected.innerHTML = '<h2><i class="bi bi-cloud-check-fill"></i> Connected • <a href="https://airtable.com/tblGUdN0uXXlqKKlJ/">Edit AirTable Data</a>'
+		
+		document.querySelector('.app-controls').insertAdjacentElement('afterbegin', connected)
+	},
 	addSection: function (column, name, data, headerClass) {
 		let section = DRAW.elementFactory('div',[{name:'class',value:'section-table'}])
 		
@@ -171,7 +205,7 @@ const DRAW = {
 			let itemLi = document.createElement('li')
 			let inputWrapper = DRAW.elementFactory('div',[{name:'class',value:'input-wrapper'}])
 			let itemInput = DRAW.elementFactory('input',[
-				{name:'type',value:'numeric'},
+				{name:'type',value:'number'},
 				{name:'min',value:'0'},
 				{name:'class',value:'qty'},
 				{name:'id',value:'qty-'+(x.name)},
@@ -215,6 +249,37 @@ const DRAW = {
 		section.appendChild(sectionList)
 		
 		document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
+	},
+	printingPress: function () {
+		//header information
+		document.querySelector('#print-builder').innerText = DATA.form.builder()
+		document.querySelector('#print-lot').innerText = DATA.form.lot()
+		document.querySelector('#print-date').innerText = DATA.form.dateString()
+		document.querySelector('#print-billed').innerText = '$' + DATA.form.billing()
+		//non-zero data
+		let materialsTotal = 0
+		let laborTotal = 0
+		DATA.materials.data.forEach( x => {
+			if (x.qty != '' && x.qty != 0 && x.qty != '0') {
+				let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
+				
+				let name = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
+				let qty = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
+				let cost = DRAW.elementFactory('p',[{name:'class',value:'column-3'}])
+				
+				name.innerText = x.name
+				qty.innerText = x.qty
+				cost.innerText = (x.qty * x.cost)
+				
+				item.appendChild(name)
+				item.appendChild(qty)
+				item.appendChild(cost)
+				document.querySelector('#print-materials-table').appendChild(item)
+			}
+		})
+		DATA.labor.data.forEach( x => {
+			
+		})
 	}
 }
 
@@ -240,12 +305,22 @@ class RATE {
 }
 const DATA = {
 	form: {
-		name: 'Form',
-		data: {
-			date: 'today',
-			builder: 'Lifestyle',
-			lot: '12B',
-			billing: '$400'
+		date: function () {
+			let date = new Date(document.querySelector('#date').value)
+			return date
+		},
+		dateString: function () {
+			let date = new Date(document.querySelector('#date').value)
+			return (date.getMonth() + 1) + '/' + (date.getDate() + 1) + '/' + date.getFullYear()
+		},
+		builder: function () {
+			return document.querySelector('#builder').value
+		},
+		lot: function () {
+			return document.querySelector('#lot').value
+		},
+		billing: function () {
+			return document.querySelector('#billing').value
 		}
 	},
 	materials: {
@@ -254,14 +329,14 @@ const DATA = {
 		data: [],
 		parseData: function (data) {
 			data.forEach( i => {
-				DATA.materials.data.push(new ITEM(i.fields.name, i.fields.cost, i.fields.unit, i.id, i.fields.section, null))
+				DATA.materials.data.push(new ITEM(i.fields.name, i.fields.cost, i.fields.unit, i.id, i.fields.section, 0))
 			})
 		},
 		sections: [['Prewire & Cable', 1],['Cable Ends & Jacks', 1],['Faceplate & Trimout', 2],['Sound, AV, & Automation', 2],['Alarm/Security', 3],['Central Vac', 3]]
 	},
 	labor: {
 		name: 'Labor',
-		at: 'Labor',
+		at: 'Labor?view=Sorted',
 		data: [],
 		parseData: function (data) {
 			data.forEach( i => {

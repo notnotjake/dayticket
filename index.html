@@ -20,45 +20,116 @@
 	<meta property="og:image" content="https://www.advanceas.com/images/logo.png">
 </head>
 <body>
-	<div class="toolbar">
-		<div class="toolbar-inputs">
-			<div class="input date">
-				<input id="date" type="date" placeholder="Builder" value="2021-01-01" min="2021-01-01" max="2050-12-31"/>
+	<div class="main">
+		<div class="toolbar">
+			<div class="toolbar-inputs">
+				<div class="input date">
+					<input id="date" type="date" placeholder="Builder" value="2021-01-01" min="2021-01-01" max="2050-12-31"/>
+				</div>
+				<div class="input builder">
+					<input id="builder" type="text" placeholder="Builder"/>
+				</div>
+				<div class="input lot">
+					<input id="lot" type="text" placeholder="Lot"/>
+				</div>
+				<div class="input billing">
+					<p>$</p>
+					<input id="billing" type="text" placeholder="Billing" onclick="select()"/>
+				</div>
 			</div>
-			<div class="input builder">
-				<input id="builder" type="text" placeholder="Builder"/>
+			<div class="toolbar-buttons">
+				<button id='print' onclick="APP.printButton()"><i class="bi bi-printer-fill"></i>Print</button>
+				<button id='export' onclick="APP.exportButton()"><i class="bi bi-file-earmark-spreadsheet-fill"></i>Export</button>
+				<button id='clear' onclick="APP.clearButton()">Clear</button>
 			</div>
-			<div class="input lot">
-				<input id="lot" type="text" placeholder="Lot"/>
-			</div>
-			<div class="input billing">
-				<p>$</p>
-				<input id="billing" type="text" placeholder="Billing" onclick="select()"/>
-			</div>
-		</div>
-		<div class="toolbar-buttons">
-			<button id='print'><i class="bi bi-printer-fill"></i>Print</button>
-			<button id='export'><i class="bi bi-file-earmark-spreadsheet-fill"></i>Export</button>
-			<button id='clear'>Clear</button>
-		</div>
-	</div>
-	
-	<div class="content-container">
-		<div class="column" id="column-1"></div>
-		<div class="column" id="column-2"></div>
-		<div class="column" id="column-3"></div>
-		<div class="column" id="column-4"></div>
-	</div>
-	
-	<div class="app-controls">
-		<div class="js-message">
-			<h2><i class="bi bi-exclamation-circle-fill"></i>Enable JavaScript to Use App</h2>
 		</div>
 		
-		<div class="footer">
-			<a href="/help"><i class="bi bi-question-circle-fill"></i> Help</a>
-			<a href="/about"><i class="bi bi-stars"></i> About</a>
+		<div class="content-container">
+			<div class="column" id="column-1"></div>
+			<div class="column" id="column-2"></div>
+			<div class="column" id="column-3"></div>
+			<div class="column" id="column-4"></div>
 		</div>
+		
+		<div class="app-controls">
+			<div class="js-message">
+				<h2><i class="bi bi-exclamation-circle-fill"></i>Enable JavaScript to Use App</h2>
+			</div>
+			
+			<div class="footer">
+				<a href="/help"><i class="bi bi-question-circle-fill"></i> Help</a>
+				<a href="/about"><i class="bi bi-stars"></i> About</a>
+			</div>
+		</div>
+	</div>
+	
+	<div class="print">
+		<div class="header">
+			<div class="builder">
+				<p>Builder</p>
+				<h3 id="print-builder"></h3>
+			</div>
+			<div>
+				<p>Lot</p>
+				<h3 id="print-lot"></h3>
+			</div>
+			<div>
+				<p>Date</p>
+				<h3 id="print-date"></h3>
+			</div>
+		</div>
+		
+		<h1>Summary</h1>
+		<div class="table-subheading">
+			<p>Billed</p>
+			<p id="print-billed"></p>
+		</div>
+		<div class="table">
+			<div class="table-entry">
+				<p class="column-1">Labor</p>
+				<p class="column-2">$180.00</p>
+			</div>
+			<div class="table-entry">
+				<p class="column-1">Materials (Incl 6% Sales Tax)</p>
+				<p class="column-2">$240.00</p>
+			</div>
+			<div class="table-entry total-line">
+				<p class="column-1">Total Cost</p>
+				<p class="column-2">$420.00</p>
+			</div>
+			<div class="table-entry total-line">
+				<p class="column-1">Gross Profit</p>
+				<p class="column-2">49.4%</p>
+				<p class="column-3">$430.00</p>
+			</div>
+		</div>
+		
+		<h1>Labor Cost</h1>
+		<div class="table-subheading">
+			<p class="column-1">Labor</p>
+			<p class="column-2">Hours</p>
+			<p class="column-3">Total Cost</p>
+		</div>
+		<div class="table" id="print-labor-table">
+			<div class="table-entry">
+				<p class="column-1">Helper ($20/hr)</p>
+				<p class="column-2">3.00</p>
+				<p class="column-3">$60.00</p>
+			</div>
+			<div class="table-entry">
+				<p class="column-1">Mechanic ($26/hr)</p>
+				<p class="column-2">2.50</p>
+				<p class="column-3">$120.00</p>
+			</div>
+		</div>
+		
+		<h1>Material Cost</h1>
+		<div class="table-subheading">
+			<p class="column-1">Product</p>
+			<p class="column-2">Qty</p>
+			<p class="column-3">Total Cost</p>
+		</div>
+		<div class="table" id="print-materials-table"></div>
 	</div>
 	
 	<script type="text/javascript" src="app.js"></script>
