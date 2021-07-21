@@ -201,6 +201,7 @@ const DRAW = {
 			let inputWrapper = DRAW.elementFactory('div',[{name:'class',value:'input-wrapper'}])
 			let itemInput = DRAW.elementFactory('input',[
 				{name:'type',value:'number'},
+				{name:'step',value:'0.01'},
 				{name:'min',value:'0'},
 				{name:'class',value:'qty'},
 				{name:'id',value:'qty-'+(x.name)},
@@ -215,7 +216,7 @@ const DRAW = {
 			item.appendChild(itemLi)
 			
 			itemInput.addEventListener('blur', () => {
-				x.qty = itemInput.value
+				x.qty = DATA.formatInput(x.unit, itemInput)
 			})
 			
 			sectionList.appendChild(item)
@@ -299,6 +300,12 @@ class RATE {
 	}
 }
 const DATA = {
+	totalCost: function () {
+		
+	},
+	grossProfit: function () {
+		
+	},
 	form: {
 		date: function () {
 			let date = new Date(document.querySelector('#date').value)
@@ -327,7 +334,13 @@ const DATA = {
 				DATA.materials.data.push(new ITEM(i.fields.name, i.fields.cost, i.fields.unit, i.id, i.fields.section, 0))
 			})
 		},
-		sections: [['Prewire & Cable', 1],['Cable Ends & Jacks', 1],['Faceplate & Trimout', 2],['Sound, AV, & Automation', 2],['Alarm/Security', 3],['Central Vac', 3]]
+		sections: [['Prewire & Cable', 1],['Cable Ends & Jacks', 1],['Faceplate & Trimout', 2],['Sound, AV, & Automation', 2],['Alarm/Security', 3],['Central Vac', 3]],
+		includedMaterials: function () {
+			
+		},
+		materialsTotal: function () {
+			
+		}
 	},
 	labor: {
 		name: 'Labor',
@@ -337,6 +350,12 @@ const DATA = {
 			data.forEach( i => {
 				DATA.labor.data.push(new RATE(i.fields.name, i.fields.regular, i.fields.overtime))
 			})
+		},
+		includedLabor: function () {
+			
+		},
+		laborTotal: function () {
+			
 		}
 	},
 	freshCookies: function () {
@@ -375,6 +394,26 @@ const DATA = {
 			DATA.bakeCookies(DATA.key.name, keyValue, days)
 			console.log('API Key Cookie Extended for 30 Days')
 		}
+	},
+	formatInput: function (type, input) {
+		let n = input.value
+		let nString = input.value
+		
+		if (type != 'whole' && n != '') {
+			while (n.includes(',')) {
+				index = n.search(',')
+				n = n.substring(0, index) + n.substring(index+1)
+			}
+			n = mathInline(n)
+			input.value = parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+			n = parseFloat(n)
+		}
+		if (type == 'whole' && n != '') {
+			n = mathInline(n.toString())
+			n = parseInt(n)
+			input.value = n
+		}
+		return n
 	}
 }
 
@@ -383,13 +422,7 @@ const DATA = {
 // billing input
 let input = document.querySelector('#billing')
 
-let timeout = null
-input.addEventListener('keyup', () => {
-	clearTimeout(timeout)
-	timeout = setTimeout(function () {
-		//do something after delay typing
-	}, 900)
-})
+
 
 function mathInline (n) {
 	if (n.includes('*')) {
@@ -425,13 +458,6 @@ function currency (n) {
 	n = parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
 	return n
 }
-
-input.addEventListener('blur', () => {
-	if (input.value != '') {
-		input.value = currency(input.value)
-	}
-})
-
 
 // sections
 let shownIcon = '<i class="bi bi-caret-down-fill"></i>'

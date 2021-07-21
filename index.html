@@ -35,7 +35,7 @@
 					</div>
 					<div class="input billing">
 						<p>$</p>
-						<input id="billing" type="text" placeholder="Billing" onclick="select()"/>
+						<input id="billing" type="text" placeholder="Billing" onclick="select()" onblur="DATA.formatInput('number', this)"/>
 					</div>
 				</div>
 				<div class="toolbar-buttons">
