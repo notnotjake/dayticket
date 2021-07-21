@@ -8,6 +8,9 @@ html, button, input, select, textarea {
 		font-family: 'Inter var', sans-serif;
 	}
 }
+:root {
+	--max-width: 1200px;
+}
 body {
 	margin: 0;
 	background-color: #f6f6f3;
@@ -36,7 +39,15 @@ body {
 	border-bottom: 1.5px solid #e4e3dd;
 	//border-top: 1.5px solid #f0f0f0;
 }
-.toolbar > div {
+.toolbar-wrapper {
+	width: 100%;
+	max-width: var(--max-width);
+	margin: auto;
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap-reverse;
+}
+.toolbar-wrapper > div {
 	margin: 0 12px 8px;
 }
 .input {
@@ -129,10 +140,12 @@ i {
 
 
 .content-container {
-	margin: 17px 12px;
+	margin: 17px auto;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	width: calc(100% - 24px);
+	max-width: calc(var(--max-width) - 24px);
 }
 .column {
 	width: calc(25% - 5px);
