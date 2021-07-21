@@ -123,13 +123,6 @@ const DRAW = {
 		var date = new Date()
 		dateField.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0)
 	},
-	toolbarEnabled: function (state) {
-		if (state) {
-			//console.log('should be enabled now')
-		} else {
-			//console.log('should be disabled')
-		}
-	},
 	auth: function (condition) {
 		if (typeof condition == 'undefined') {
 			let authForm = DRAW.elementFactory('div',[{name:'class',value:'auth-container'}])
