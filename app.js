@@ -265,7 +265,7 @@ const DRAW = {
 				
 				name.innerText = x.name
 				qty.innerText = x.qty
-				cost.innerText = (x.qty * x.cost)
+				cost.innerText = '$' + parseFloat(x.qty * x.cost).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
 				
 				item.appendChild(name)
 				item.appendChild(qty)
@@ -274,7 +274,22 @@ const DRAW = {
 			}
 		})
 		DATA.labor.data.forEach( x => {
-			
+			if (x.qty != '' && x.qty != 0 && x.qty != '0') {
+				let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
+				
+				let name = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
+				let qty = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
+				let cost = DRAW.elementFactory('p',[{name:'class',value:'column-3'}])
+				
+				name.innerText = x.name + ' ($' + x.regWage + '/hr)'
+				qty.innerText = x.qty
+				cost.innerText = '$' + parseFloat(x.qty * x.regWage).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+				
+				item.appendChild(name)
+				item.appendChild(qty)
+				item.appendChild(cost)
+				document.querySelector('#print-labor-table').appendChild(item)
+			}
 		})
 	}
 }
@@ -286,7 +301,7 @@ class ITEM {
 		this.unit = unit
 		this.id = id
 		this.section = section
-		this.qty = qty
+		this.qty = ''
 	}
 }
 class RATE {
@@ -295,7 +310,7 @@ class RATE {
 		this.regWage = regWage
 		this.otWage = otWage
 		this.id = id
-		this.qty = hours
+		this.qty = ''
 		this.unit = 'hrs'
 	}
 }
