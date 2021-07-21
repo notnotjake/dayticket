@@ -78,7 +78,7 @@ const APP = {
 		}
 	},
 	printButton: function () {
-		document.title = 'Dayticket: ' + DATA.form.builder() + ' ' + DATA.form.dateString()
+		document.title = 'Dayticket_' + DATA.form.builder() + '_Lot-' + DATA.form.lot() +'_' + DATA.form.dateString()
 		DRAW.printingPress()
 		window.print()
 		document.title = 'Dayticket Entry'
@@ -120,7 +120,6 @@ const DRAW = {
 		document.querySelector('.js-message').remove()
 	},
 	setToolbarActive: function () {
-		console.log('set toolbar active')
 		document.querySelector('#date').disabled = false
 		document.querySelector('#builder').disabled = false
 		document.querySelector('#lot').disabled = false
@@ -263,45 +262,49 @@ const DRAW = {
 		document.querySelector('#print-builder').innerText = DATA.form.builder()
 		document.querySelector('#print-lot').innerText = DATA.form.lot()
 		document.querySelector('#print-date').innerText = DATA.form.dateString()
+		//summary section
 		document.querySelector('#print-billed').innerText = '$' + DATA.form.billing()
+		document.querySelector('#print-labor-total').innerText = '$' + DATA.labor.total()
+		document.querySelector('#print-materials-total').innerText = '$' + DATA.materials.total()
+		document.querySelector('#print-total-cost').innerText = '$' + DATA.totalCost()
+		document.querySelector('#print-gross-num').innerText = '$' + DATA.grossProfit().num
+		document.querySelector('#print-gross-perc').innerText = DATA.grossProfit().perc + '%'
+		
 		//non-zero data
 		let materialsTotal = 0
 		let laborTotal = 0
-		DATA.materials.data.forEach( x => {
-			if (x.qty != '' && x.qty != 0 && x.qty != '0') {
-				let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
-				
-				let name = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
-				let qty = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
-				let cost = DRAW.elementFactory('p',[{name:'class',value:'column-3'}])
-				
-				name.innerText = x.name
-				qty.innerText = x.qty
-				cost.innerText = '$' + parseFloat(x.qty * x.cost).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-				
-				item.appendChild(name)
-				item.appendChild(qty)
-				item.appendChild(cost)
-				document.querySelector('#print-materials-table').appendChild(item)
-			}
+		
+		DATA.materials.includes().forEach( x => {
+			let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
+			
+			let name = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
+			let qty = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
+			let cost = DRAW.elementFactory('p',[{name:'class',value:'column-3'}])
+			
+			name.innerText = x.name
+			qty.innerText = x.qty
+			cost.innerText = '$' + parseFloat(x.qty * x.cost).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+			
+			item.appendChild(name)
+			item.appendChild(qty)
+			item.appendChild(cost)
+			document.querySelector('#print-materials-table').appendChild(item)
 		})
-		DATA.labor.data.forEach( x => {
-			if (x.qty != '' && x.qty != 0 && x.qty != '0') {
-				let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
-				
-				let name = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
-				let qty = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
-				let cost = DRAW.elementFactory('p',[{name:'class',value:'column-3'}])
-				
-				name.innerText = x.name + ' ($' + x.regWage + '/hr)'
-				qty.innerText = x.qty
-				cost.innerText = '$' + parseFloat(x.qty * x.regWage).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-				
-				item.appendChild(name)
-				item.appendChild(qty)
-				item.appendChild(cost)
-				document.querySelector('#print-labor-table').appendChild(item)
-			}
+		DATA.labor.includes().forEach( x => {
+			let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
+			
+			let name = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
+			let qty = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
+			let cost = DRAW.elementFactory('p',[{name:'class',value:'column-3'}])
+			
+			name.innerText = x.name + ' ($' + x.regWage + '/hr)'
+			qty.innerText = x.qty
+			cost.innerText = '$' + parseFloat(x.qty * x.regWage).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+			
+			item.appendChild(name)
+			item.appendChild(qty)
+			item.appendChild(cost)
+			document.querySelector('#print-labor-table').appendChild(item)
 		})
 	}
 }
@@ -328,10 +331,14 @@ class RATE {
 }
 const DATA = {
 	totalCost: function () {
-		
+		let totalCost = parseFloat(DATA.materials.total()) + parseFloat(DATA.labor.total())
+		return totalCost.toFixed(2)
 	},
 	grossProfit: function () {
+		let num = (DATA.form.billing() - DATA.totalCost()).toFixed(2)
+		let perc = ((num / DATA.form.billing())*100).toFixed(1)
 		
+		return {num:num, perc:perc}
 	},
 	form: {
 		date: function () {
@@ -362,11 +369,21 @@ const DATA = {
 			})
 		},
 		sections: [['Prewire & Cable', 1],['Cable Ends & Jacks', 1],['Faceplate & Trimout', 2],['Sound, AV, & Automation', 2],['Alarm/Security', 3],['Central Vac', 3]],
-		includedMaterials: function () {
-			
+		includes: function () {
+			let includesData = []
+			DATA.materials.data.forEach( x => {
+				if (x.qty != '' && x.qty != 0 && x.qty != '0') {
+					includesData.push(x)
+				}
+			})
+			return includesData
 		},
-		materialsTotal: function () {
-			
+		total: function () {
+			let total = 0
+			DATA.materials.includes().forEach( x => {
+				total += (x.qty * x.cost) * 1.06
+			})
+			return total.toFixed(2)
 		}
 	},
 	labor: {
@@ -378,11 +395,21 @@ const DATA = {
 				DATA.labor.data.push(new RATE(i.fields.name, i.fields.regular, i.fields.overtime))
 			})
 		},
-		includedLabor: function () {
-			
+		includes: function () {
+			let includesData = []
+			DATA.labor.data.forEach( x => {
+				if (x.qty != '' && x.qty != 0 && x.qty != '0') {
+					includesData.push(x)
+				}
+			})
+			return includesData
 		},
-		laborTotal: function () {
-			
+		total: function () {
+			let total = 0
+			DATA.labor.includes().forEach( x => {
+				total += x.qty * x.regWage
+			})
+			return total.toFixed(2)
 		}
 	},
 	freshCookies: function () {
