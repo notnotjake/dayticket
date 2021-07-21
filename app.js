@@ -306,6 +306,26 @@ const DRAW = {
 			item.appendChild(cost)
 			document.querySelector('#print-labor-table').appendChild(item)
 		})
+		
+		//materials subtotal, tax
+		let materialsSubtotal = 0
+		DATA.materials.includes().forEach( x => {
+			materialsSubtotal += (x.qty * x.cost)
+		})
+		let salesTax = materialsSubtotal * 0.06
+		
+		materialsSubtotal.toFixed(2)
+		salesTax.toFixed(2)
+		
+		let materialsTaxLine = DRAW.elementFactory('div',[{name:'class',value:'table-entry total-line'}])
+		let materialsTaxTitle = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
+		materialsTaxTitle.innerText = 'Sales Tax'
+		let materialsTaxNumber = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
+		materialsTaxNumber.innerText = '$' + salesTax
+		materialsTaxLine.appendChild(materialsTaxTitle)
+		materialsTaxLine.appendChild(materialsTaxNumber)
+		
+		document.querySelector('#print-materials-table').appendChild(materialsTaxLine)
 	}
 }
 
