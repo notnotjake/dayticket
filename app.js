@@ -47,6 +47,7 @@ const APP = {
 					if (firstTime) {
 						DATA.key.renew(30)
 						DRAW.connectedStatus()
+						DRAW.setToolbarActive()
 						firstTime = false
 					}
 				})
@@ -117,6 +118,17 @@ const DRAW = {
 	},
 	removeJSMessage: function () {
 		document.querySelector('.js-message').remove()
+	},
+	setToolbarActive: function () {
+		console.log('set toolbar active')
+		document.querySelector('#date').disabled = false
+		document.querySelector('#builder').disabled = false
+		document.querySelector('#lot').disabled = false
+		document.querySelector('#billing').disabled = false
+		document.querySelector('.input p').style.color = '#000000'
+		document.querySelector('#print').disabled = false
+		document.querySelector('#export').disabled = false
+		document.querySelector('#clear').disabled = false
 	},
 	setDatePicker: function () {
 		var dateField = document.querySelector('#date')
@@ -461,16 +473,6 @@ function mathInline (n) {
 		term2 = parseFloat(n.substring(index+1) )
 		n = term1 + term2
 	}
-	return n
-}
-
-function currency (n) {
-	while (n.includes(',')) {
-		index = n.search(',')
-		n = n.substring(0, index) + n.substring(index+1)
-	}
-	n = mathInline(n)
-	n = parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
 	return n
 }
 

@@ -25,23 +25,23 @@
 			<div class="toolbar-wrapper">
 				<div class="toolbar-inputs">
 					<div class="input date">
-						<input id="date" type="date" placeholder="Builder" value="2021-01-01" min="2021-01-01" max="2050-12-31"/>
+						<input id="date" type="date" placeholder="Builder" value="2021-01-01" min="2021-01-01" max="2050-12-31" disabled/>
 					</div>
 					<div class="input builder">
-						<input id="builder" type="text" placeholder="Builder"/>
+						<input id="builder" type="text" placeholder="Builder" disabled/>
 					</div>
 					<div class="input lot">
-						<input id="lot" type="text" placeholder="Lot"/>
+						<input id="lot" type="text" placeholder="Lot" disabled/>
 					</div>
 					<div class="input billing">
 						<p>$</p>
-						<input id="billing" type="text" placeholder="Billing" onclick="select()" onblur="DATA.formatInput('number', this)"/>
+						<input id="billing" type="text" placeholder="Billing" onclick="select()" onblur="DATA.formatInput('number', this)" disabled/>
 					</div>
 				</div>
 				<div class="toolbar-buttons">
-					<button id='print' onclick="APP.printButton()"><i class="bi bi-printer-fill"></i>Print</button>
-					<button id='export' onclick="APP.exportButton()"><i class="bi bi-file-earmark-spreadsheet-fill"></i>Export</button>
-					<button id='clear' onclick="APP.clearButton()">Clear</button>
+					<button id='print' onclick="APP.printButton()" disabled><i class="bi bi-printer-fill" ></i>Print</button>
+					<button id='export' onclick="APP.exportButton()" disabled><i class="bi bi-file-earmark-spreadsheet-fill"></i>Export</button>
+					<button id='clear' onclick="APP.clearButton()" disabled>Clear</button>
 				</div>
 			</div>
 		</div>
