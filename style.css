@@ -446,4 +446,10 @@ i {
 		margin-right: 0;
 		margin-bottom: 5px;
 	}
+	.content-container {
+		flex-direction: column;
+	}
+	.column {
+		width: 100%;
+	}
 }
