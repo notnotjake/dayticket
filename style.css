@@ -222,8 +222,17 @@ i {
 	padding-right: 5px;
 	color: #3b6eb7;
 }
+.content-container input::-webkit-outer-spin-button,
+.content-container input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.content-container input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .input-wrapper {
-	height: available;
+	height: 100%;
 }
 .section-table input:focus {
 	background-color: #f6f5f0;
