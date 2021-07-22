@@ -204,12 +204,9 @@ i {
 }
 .section-table li {
 	display: flex;
-	align-items: center;
+	//align-items: center;
 	border-bottom: 1px solid #cccccc;
 	font-size: 13px;
-}
-li > div {
-	//height: 100%;
 }
 
 .section-table input {
