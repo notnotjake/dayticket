@@ -210,6 +210,7 @@ i {
 }
 
 .section-table input {
+	position: relative;
 	box-sizing: border-box;
 	padding: 0 5px 0 10px;
 	margin-right: 5px;

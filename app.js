@@ -484,50 +484,43 @@ const DATA = {
 				index = n.search(',')
 				n = n.substring(0, index) + n.substring(index+1)
 			}
-			n = mathInline(n)
+			n = DATA.mathInline(n)
 			input.value = parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
 			n = parseFloat(n)
 		}
 		if (type == 'whole' && n != '') {
-			n = mathInline(n.toString())
+			n = DATA.mathInline(n.toString())
 			n = parseInt(n)
 			input.value = n
+		}
+		return n
+	},
+	mathInline: function (n) {
+		if (n.includes('*')) {
+			index = n.search('\\*')
+			term1 = parseFloat(n.substring(0, index) )
+			term2 = parseFloat(n.substring(index+1) )
+			n = term1 * term2
+		} else if (n.includes('/')) {
+			index = n.search('/')
+			dividend = parseFloat(n.substring(0, index) )
+			divisor = parseFloat(n.substring(index+1) )
+			n = dividend / divisor
+		} else if (n.includes('-')) {
+			index = n.search('-')
+			term1 = parseFloat(n.substring(0, index) )
+			term2 = parseFloat(n.substring(index+1) )
+			n = term1 - term2
+		} else if (n.includes('+')) {
+			index = n.search('\\+')
+			term1 = parseFloat(n.substring(0, index) )
+			term2 = parseFloat(n.substring(index+1) )
+			n = term1 + term2
 		}
 		return n
 	}
 }
 
-
-
-// billing input
-let input = document.querySelector('#billing')
-
-
-
-function mathInline (n) {
-	if (n.includes('*')) {
-		index = n.search('\\*')
-		term1 = parseFloat(n.substring(0, index) )
-		term2 = parseFloat(n.substring(index+1) )
-		n = term1 * term2
-	} else if (n.includes('/')) {
-		index = n.search('/')
-		dividend = parseFloat(n.substring(0, index) )
-		divisor = parseFloat(n.substring(index+1) )
-		n = dividend / divisor
-	} else if (n.includes('-')) {
-		index = n.search('-')
-		term1 = parseFloat(n.substring(0, index) )
-		term2 = parseFloat(n.substring(index+1) )
-		n = term1 - term2
-	} else if (n.includes('+')) {
-		index = n.search('\\+')
-		term1 = parseFloat(n.substring(0, index) )
-		term2 = parseFloat(n.substring(index+1) )
-		n = term1 + term2
-	}
-	return n
-}
 
 // sections
 let shownIcon = '<i class="bi bi-caret-down-fill"></i>'
