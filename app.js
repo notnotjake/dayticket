@@ -41,13 +41,13 @@ const APP = {
 				.then(responseData => {
 					dataObj.parseData(responseData.records)
 					console.log(dataObj.name + ' Data Retrieved Successfully:')
-					//console.log(dataObj.data)
 					APP.renderData(dataObj)
 					
 					if (firstTime) {
 						DATA.key.renew(30)
 						DRAW.connectedStatus()
 						DRAW.setToolbarActive()
+						//DRAW.addSingleUse()
 						firstTime = false
 					}
 				})
@@ -129,6 +129,11 @@ const DRAW = {
 		document.querySelector('#export').disabled = false
 		document.querySelector('#clear').disabled = false
 	},
+	connectedStatus: function () {
+		let connected = DRAW.elementFactory('div',[{name:'class',value:'app-status'}])
+		connected.innerHTML = '<h2><i class="bi bi-cloud-check-fill"></i> Connected • <a href="https://airtable.com/tblGUdN0uXXlqKKlJ/">Edit AirTable Data</a>'
+		document.querySelector('.app-controls').insertAdjacentElement('afterbegin', connected)
+	},
 	setDatePicker: function () {
 		var dateField = document.querySelector('#date')
 		var date = new Date()
@@ -189,11 +194,16 @@ const DRAW = {
 		}
 		document.querySelector('#new-auth-key').select()
 	},
-	connectedStatus: function () {
-		let connected = DRAW.elementFactory('div',[{name:'class',value:'app-status'}])
-		connected.innerHTML = '<h2><i class="bi bi-cloud-check-fill"></i> Connected • <a href="https://airtable.com/tblGUdN0uXXlqKKlJ/">Edit AirTable Data</a>'
+	addSingleUse: function () {
+		let section = DRAW.elementFactory('div',[{name:'class',value:'section-table'}])
 		
-		document.querySelector('.app-controls').insertAdjacentElement('afterbegin', connected)
+		let sectionHeader = document.createElement('h1')
+		sectionHeader.innerText = 'Single Use Items'
+		sectionHeader.classList.add(headerClass)
+		
+		section.appendChild(sectionHeader)
+		
+		document.querySelector('#column-4').insertAdjacentElement('beforeend', section)
 	},
 	addSection: function (column, name, data, headerClass) {
 		let section = DRAW.elementFactory('div',[{name:'class',value:'section-table'}])
@@ -219,7 +229,7 @@ const DRAW = {
 				{name:'onclick',value:'select()'},
 				{name:'inputmode',value:'decimal'},
 				{name:'placeholder',value:placeholderText}])
-			let itemP = document.createElement('p')
+			let itemP = DRAW.elementFactory('div',[{name:'class',value:'item-name'}])
 			itemP.innerText = x.name
 			
 			inputWrapper.appendChild(itemInput)
@@ -270,10 +280,6 @@ const DRAW = {
 		document.querySelector('#print-total-cost').innerText = '$' + DATA.totalCost()
 		document.querySelector('#print-gross-num').innerText = '$' + DATA.grossProfit().num
 		document.querySelector('#print-gross-perc').innerText = DATA.grossProfit().perc + '%'
-		
-		//non-zero data
-		let materialsTotal = 0
-		let laborTotal = 0
 		
 		DATA.materials.includes().forEach( x => {
 			let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
@@ -472,7 +478,6 @@ const DATA = {
 	},
 	formatInput: function (type, input) {
 		let n = input.value
-		let nString = input.value
 		
 		if (type != 'whole' && n != '') {
 			while (n.includes(',')) {

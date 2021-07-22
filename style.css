@@ -208,8 +208,26 @@ i {
 	display: flex;
 	align-items: center;
 }
-.section-table p {
-	padding: 0 6px;
+
+.section-test1 {
+	border-bottom: 1px solid #cccccc;
+	font-size: 13px;
+	display: flex;
+	align-items: center;
+	justify-content: start;
+}
+.test-child {
+	//flex: 1;
+}
+.test-child:first-child {
+	width: 20px;
+}
+.test-child:nth-child(2) {
+	//width: 80%;
+}
+
+.item-name {
+	padding: 5px 6px;
 	margin: 0;
 }
 .section-table input {
@@ -231,9 +249,17 @@ i {
   -moz-appearance: textfield;
 }
 
-.input-wrapper {
-	height: 100%;
+.input-wrapper, .item-name {
+	flex: 1;
 }
+
+.input-wrapper {
+	width: 10%;
+}
+.item-name {
+	width: 90%;
+}
+
 .section-table input:focus {
 	background-color: #f6f5f0;
 	z-index: 2;
