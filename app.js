@@ -219,7 +219,7 @@ const DRAW = {
 			
 			let item = document.createElement('label')
 			let itemLi = document.createElement('li')
-			let inputWrapper = DRAW.elementFactory('div',[{name:'class',value:'input-wrapper'}])
+			let inputWrapper = document.createElement('div')
 			let itemInput = DRAW.elementFactory('input',[
 				{name:'type',value:'number'},
 				{name:'step',value:'0.01'},
@@ -229,7 +229,7 @@ const DRAW = {
 				{name:'onclick',value:'select()'},
 				{name:'inputmode',value:'decimal'},
 				{name:'placeholder',value:placeholderText}])
-			let itemP = DRAW.elementFactory('div',[{name:'class',value:'item-name'}])
+			let itemP = document.createElement('p')
 			itemP.innerText = x.name
 			
 			inputWrapper.appendChild(itemInput)

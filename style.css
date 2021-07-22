@@ -69,7 +69,7 @@ body {
 .date {
 	width: auto;
 }
-.toolbar input, .section-table input {
+.toolbar input {
 	box-sizing: border-box;
 	padding: 0 10px 0 10px;
 	height: 100%;
@@ -136,7 +136,6 @@ input::-webkit-inner-spin-button {
 	border-bottom: 1px solid #d1d1d1;
 
 }
-
 #print {
 	margin-right: 0;
 	border-radius: 5px 0 0 5px;
@@ -164,13 +163,13 @@ i {
 .column {
 	width: calc(25% - 5px);
 }
-
 .section-table {
 	width: 100%;
 	background-color: #e8e7df;
 	border-bottom: 1.5px solid #cccccc;
 	margin-bottom: 10px;
 }
+
 .section-table h1 {
 	font-size: 15px;
 	font-weight: 400;
@@ -196,6 +195,7 @@ i {
 .section-table button:active {
 	color: #777792;
 }
+
 .section-table ul {
 	list-style: none;
 	list-style-type: none;
@@ -203,42 +203,30 @@ i {
 	margin: 0;
 }
 .section-table li {
-	border-bottom: 1px solid #cccccc;
-	font-size: 13px;
 	display: flex;
 	align-items: center;
-}
-
-.section-test1 {
 	border-bottom: 1px solid #cccccc;
 	font-size: 13px;
-	display: flex;
-	align-items: center;
-	justify-content: start;
 }
-.test-child {
-	//flex: 1;
-}
-.test-child:first-child {
-	width: 20px;
-}
-.test-child:nth-child(2) {
-	//width: 80%;
+li > div {
+	//height: 100%;
 }
 
-.item-name {
-	padding: 5px 6px;
-	margin: 0;
-}
 .section-table input {
-	position: relative;
-	background-color: #f0efeb;
-	width: 60px;
+	box-sizing: border-box;
+	padding: 0 5px 0 10px;
+	margin-right: 5px;
+	height: 100%;
 	min-height: 29px;
+	width: 60px;
+	
+	background-color: #f0efeb;
 	border-radius: 0;
+	border: none;
 	text-align: right;
-	padding-right: 5px;
 	color: #3b6eb7;
+	font-size: 13px;
+	font-weight: 500;
 }
 .content-container input::-webkit-outer-spin-button,
 .content-container input::-webkit-inner-spin-button {
@@ -248,18 +236,6 @@ i {
 .content-container input[type=number] {
   -moz-appearance: textfield;
 }
-
-.input-wrapper, .item-name {
-	flex: 1;
-}
-
-.input-wrapper {
-	width: 10%;
-}
-.item-name {
-	width: 90%;
-}
-
 .section-table input:focus {
 	background-color: #f6f5f0;
 	z-index: 2;
@@ -269,6 +245,10 @@ i {
 	color: #d0434d;
 }
 
+.section-table p {
+	padding: 5px 5px 3px 0;
+	margin: 0;
+}
 
 
 
