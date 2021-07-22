@@ -150,6 +150,18 @@ i {
 }
 
 
+.collapseBtn-container {
+	margin: 1px auto;
+	width: calc(100% - 24px);
+	max-width: calc(var(--max-width) - 24px);
+	//background-color: red;
+}
+.collapseBtn-container button {
+	background-color: transparent;
+	border: none;
+	color: #47a2ef;
+	cursor: pointer;
+}
 
 
 .content-container {

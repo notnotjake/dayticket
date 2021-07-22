@@ -209,6 +209,7 @@ const DRAW = {
 		let section = DRAW.elementFactory('div',[{name:'class',value:'section-table'}])
 		
 		let sectionList = document.createElement('ul')
+		sectionList.classList.add('section-list')
 		data.forEach( x => {
 			let placeholderText = ''
 			if (x.unit == 'whole') {
@@ -243,21 +244,21 @@ const DRAW = {
 			
 			sectionList.appendChild(item)
 		})
+		sectionList.style.display = 'block'
 		
 		let sectionHeader = document.createElement('h1')
 			sectionHeader.innerText = name
 			sectionHeader.classList.add(headerClass)
 		
 		let expandButton = document.createElement('button')
-			sectionList.style.display = 'block'
+			expandButton.classList.add('expand-button')
 			expandButton.innerHTML = shownIcon
+			
 			expandButton.addEventListener('click', () => {
 				if (sectionList.style.display == 'block') {
-					sectionList.style.display = 'none'
-					expandButton.innerHTML = hiddenIcon
+					DRAW.hideSection(sectionList, expandButton)
 				} else {
-					sectionList.style.display = 'block'
-					expandButton.innerHTML = shownIcon
+					DRAW.showSection(sectionList, expandButton)
 				}
 			})
 		
@@ -267,6 +268,23 @@ const DRAW = {
 		section.appendChild(sectionList)
 		
 		document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
+	},
+	showhideSection: function (section, button) {
+		if (section.style.display == 'block') {
+			section.style.display = 'none'
+			button.innerHTML = hiddenIcon
+		} else {
+			section.style.display = 'block'
+			button.innerHTML = shownIcon
+		}
+	},
+	showSection: function (section, button) {
+		section.style.display = 'block'
+		button.innerHTML = shownIcon
+	},
+	hideSection: function (section, button) {
+		section.style.display = 'none'
+		button.innerHTML = hiddenIcon
 	},
 	printingPress: function () {
 		//header information
@@ -333,6 +351,24 @@ const DRAW = {
 		materialsTaxLine.appendChild(materialsTaxNumber)
 		
 		document.querySelector('#print-materials-table').appendChild(materialsTaxLine)
+	},
+	collapseAll: function () {
+		console.log('hide...')
+		document.querySelector('#showcollapseBtn').innerText = 'Expand All'
+		document.querySelector('#showcollapseBtn').setAttribute('onClick','DRAW.expandAll()')
+		
+		document.querySelectorAll('.section-table').forEach( x => {
+			DRAW.hideSection(x.querySelector('ul'),x.querySelector('button'))
+		})
+	},
+	expandAll: function () {
+		console.log('expand...')
+		document.querySelector('#showcollapseBtn').innerText = 'Collapse All'
+		document.querySelector('#showcollapseBtn').setAttribute('onClick','DRAW.collapseAll()')
+		
+		document.querySelectorAll('.section-table').forEach( x => {
+			DRAW.showSection(x.querySelector('ul'),x.querySelector('button'))
+		})
 	}
 }
 
