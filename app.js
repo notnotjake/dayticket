@@ -1,5 +1,5 @@
 const APP = {
-	init: function () {
+	init() {
 		DRAW.removeJSMessage()
 		DRAW.setDatePicker()
 		
@@ -9,7 +9,7 @@ const APP = {
 			DRAW.auth()
 		}
 	},
-	getData: function (dataObjList) {
+	getData(dataObjList) {
 		let helpText = ''
 		let firstTime = true
 				
@@ -44,10 +44,7 @@ const APP = {
 					APP.renderData(dataObj)
 					
 					if (firstTime) {
-						DATA.key.renew(30)
-						DRAW.connectedStatus()
-						DRAW.setToolbarActive()
-						//DRAW.addSingleUse()
+						APP.connected()
 						firstTime = false
 					}
 				})
@@ -61,7 +58,13 @@ const APP = {
 				})
 		})
 	},
-	renderData: function (dataObj) {
+	connected() {
+		DATA.key.renew(30)
+		DRAW.connectedStatus()
+		DRAW.setToolbarActive()
+		//DRAW.addSingleUse()
+	},
+	renderData(dataObj) {
 		if (dataObj.name == 'Materials') {
 			dataObj.sections.forEach( x => {
 				let sectionData = []
@@ -77,13 +80,14 @@ const APP = {
 			DRAW.addSection(4,dataObj.name,dataObj.data,'labor')
 		}
 	},
-	printButton: function () {
+	printButton() {
 		document.title = 'Dayticket_' + DATA.form.builder() + '_Lot-' + DATA.form.lot() +'_' + DATA.form.dateString()
 		DRAW.printingPress()
 		window.print()
 		document.title = 'Dayticket Entry'
+		DRAW.printingPull()
 	},
-	exportButton: function () {
+	exportButton() {
 		download('test.txt', 'hello world')
 		
 		function download(filename, contents) {
@@ -100,26 +104,49 @@ const APP = {
 		}
 		
 	},
-	clearButton: function () {
+	clearButton() {
+		const event = new Event('input')
 		document.querySelectorAll('input').forEach( (x) => {
 			x.value = ''
+			x.dispatchEvent(event)
 		})
 		DRAW.setDatePicker()
+		//clear needs to also clear the qty stored in the data layer
 	},
+	statusInternal: '',
+	set status(val) {
+		this.statusInternal = val
+		this.listener(val)
+	},
+	get status() {
+		return this.statusInternal
+	},
+	listener(val) {
+		console.log('Status set ' + val)
+	}
 }
-
 const DRAW = {
-	elementFactory: function (elem, attr) {
+	elementFactory(elem, options) {
 		let objectNode = document.createElement(elem)
-		attr.forEach( (x) => {
-			objectNode.setAttribute(x.name, x.value)
-		})
+		if (options) {
+			Object.entries(options).forEach( x => {
+				if (x[0] == 'text') {
+					objectNode.innerText = x[1]
+				}
+				else if (x[0] == 'html') {
+					objectNode.innerHTML = x[1]
+				}
+				else {
+					objectNode.setAttribute(x[0], x[1])
+				}
+			})
+		}
 		return objectNode
 	},
-	removeJSMessage: function () {
+	removeJSMessage() {
 		document.querySelector('.js-message').remove()
 	},
-	setToolbarActive: function () {
+	setToolbarActive() {
 		document.querySelector('#date').disabled = false
 		document.querySelector('#builder').disabled = false
 		document.querySelector('#lot').disabled = false
@@ -129,36 +156,40 @@ const DRAW = {
 		document.querySelector('#export').disabled = false
 		document.querySelector('#clear').disabled = false
 	},
-	connectedStatus: function () {
-		let connected = DRAW.elementFactory('div',[{name:'class',value:'app-status'}])
-		connected.innerHTML = '<h2><i class="bi bi-cloud-check-fill"></i> Connected • <a href="https://airtable.com/tblGUdN0uXXlqKKlJ/">Edit AirTable Data</a>'
+	connectedStatus() {
+		let connected = DRAW.elementFactory('div', {
+			html:'<h2><i class="bi bi-cloud-check-fill"></i> Connected • <a href="https://airtable.com/tblGUdN0uXXlqKKlJ/">Edit AirTable Data</a>',
+			class:'app-status'
+		})
 		document.querySelector('.app-controls').insertAdjacentElement('afterbegin', connected)
 	},
-	setDatePicker: function () {
+	setDatePicker() {
 		var dateField = document.querySelector('#date')
 		var date = new Date()
 		dateField.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0)
 	},
-	auth: function (condition) {
+	auth(condition) {
 		if (typeof condition == 'undefined') {
-			let authForm = DRAW.elementFactory('div',[{name:'class',value:'auth-container'}])
-			
-			authForm.innerHTML = '<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>'
-			let form = DRAW.elementFactory('div',[{name:'class',value:'new-auth'}])
-			let input = DRAW.elementFactory('input',[
-				{name:'type',value:'text'},
-				{name:'id',value:'new-auth-key'},
-				{name:'placeholder',value:'Security Key'},
-				{name:'autofocus',value:'true'},
-				{name:'required',value:'true'},
-				{name:'onclick',value:'select()'}
-				])
+			let authForm = DRAW.elementFactory('div', {
+				html:'<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>',
+				class:'auth-container'
+			})
+
+			let form = DRAW.elementFactory('div', {class:'new-auth'})
+			let input = DRAW.elementFactory('input', {
+				type:'text',
+				id:'new-auth-key',
+				placeholder:'Security Key',
+				autofocus:'true',
+				required:'true',
+				onclick:'select()'
+			})
 			input.value = DATA.key.value()
-			let button = DRAW.elementFactory('button',[
-				{name:'id',value:'new-auth-enroll'},
-				{name:'disabled',value:'true'},
-				])
-				button.innerHTML = '<i class="bi bi-arrow-right-circle-fill"></i>'
+			let button = DRAW.elementFactory('button', {
+				html: '<i class="bi bi-arrow-right-circle-fill"></i>',
+				id:'new-auth-enroll',
+				disabled:'true',
+			})
 			//activate button when input is not empty
 			input.addEventListener('input', () => {
 				document.querySelector('#auth-help').innerHTML = ''
@@ -184,8 +215,8 @@ const DRAW = {
 			form.appendChild(input)
 			form.appendChild(button)
 			authForm.appendChild(form)
-			authForm.appendChild(DRAW.elementFactory('p',[{name:'id',value:'auth-help'}]))
-						
+			authForm.appendChild(DRAW.elementFactory('p',{id:'auth-help'}))
+			
 			document.querySelector('.app-controls').insertAdjacentElement('afterbegin', authForm)
 		}
 		else {
@@ -194,22 +225,19 @@ const DRAW = {
 		}
 		document.querySelector('#new-auth-key').select()
 	},
-	addSingleUse: function () {
-		let section = DRAW.elementFactory('div',[{name:'class',value:'section-table'}])
-		
-		let sectionHeader = document.createElement('h1')
-		sectionHeader.innerText = 'Single Use Items'
-		sectionHeader.classList.add(headerClass)
-		
+	addSingleUse() {
+		let section = DRAW.elementFactory('div', {class:'section-table'})
+		let sectionHeader = DRAW.elementFactory('h1', {
+			text:'Single Use Items',
+			class:''
+		})
 		section.appendChild(sectionHeader)
-		
 		document.querySelector('#column-4').insertAdjacentElement('beforeend', section)
 	},
-	addSection: function (column, name, data, headerClass) {
-		let section = DRAW.elementFactory('div',[{name:'class',value:'section-table'}])
-		
-		let sectionList = document.createElement('ul')
-		sectionList.classList.add('section-list')
+	addSection(column, name, data, headerClass) {
+		let section = DRAW.elementFactory('div', {class:'section-table'})
+		let sectionList = DRAW.elementFactory('ul', {class:'section-list'})
+
 		data.forEach( x => {
 			let placeholderText = ''
 			if (x.unit == 'whole') {
@@ -221,17 +249,17 @@ const DRAW = {
 			let item = document.createElement('label')
 			let itemLi = document.createElement('li')
 			let inputWrapper = document.createElement('div')
-			let itemInput = DRAW.elementFactory('input',[
-				{name:'type',value:'number'},
-				{name:'step',value:'0.01'},
-				{name:'min',value:'0'},
-				{name:'class',value:'qty'},
-				{name:'id',value:'qty-'+(x.name)},
-				{name:'onclick',value:'select()'},
-				{name:'inputmode',value:'decimal'},
-				{name:'placeholder',value:placeholderText}])
-			let itemP = document.createElement('p')
-			itemP.innerText = x.name
+			let itemInput = DRAW.elementFactory('input', {
+				type:'number',
+				step:'0.01',
+				min:'0',
+				class:'qty',
+				id:'qty'+(x.name),
+				onclick:'select()',
+				inputmode:'decimal',
+				placeholder: placeholderText,
+			})
+			let itemP = DRAW.elementFactory('p', {text: x.name})
 			
 			inputWrapper.appendChild(itemInput)
 			itemLi.appendChild(inputWrapper)
@@ -246,21 +274,22 @@ const DRAW = {
 		})
 		sectionList.style.display = 'block'
 		
-		let sectionHeader = document.createElement('h1')
-			sectionHeader.innerText = name
-			sectionHeader.classList.add(headerClass)
+		let sectionHeader = DRAW.elementFactory('h1', {
+			text: name,
+			class: headerClass
+		})
 		
-		let expandButton = document.createElement('button')
-			expandButton.classList.add('expand-button')
-			expandButton.innerHTML = shownIcon
-			
-			expandButton.addEventListener('click', () => {
-				if (sectionList.style.display == 'block') {
-					DRAW.hideSection(sectionList, expandButton)
-				} else {
-					DRAW.showSection(sectionList, expandButton)
-				}
-			})
+		let expandButton = DRAW.elementFactory('button', {
+			html: shownIcon,
+			class:'expand-button'
+		})
+		expandButton.addEventListener('click', () => {
+			if (sectionList.style.display == 'block') {
+				DRAW.hideSection(sectionList, expandButton)
+			} else {
+				DRAW.showSection(sectionList, expandButton)
+			}
+		})
 		
 		sectionHeader.insertAdjacentElement('afterbegin', expandButton)
 		
@@ -269,24 +298,15 @@ const DRAW = {
 		
 		document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
 	},
-	showhideSection: function (section, button) {
-		if (section.style.display == 'block') {
-			section.style.display = 'none'
-			button.innerHTML = hiddenIcon
-		} else {
-			section.style.display = 'block'
-			button.innerHTML = shownIcon
-		}
-	},
-	showSection: function (section, button) {
+	showSection(section, button) {
 		section.style.display = 'block'
 		button.innerHTML = shownIcon
 	},
-	hideSection: function (section, button) {
+	hideSection(section, button) {
 		section.style.display = 'none'
 		button.innerHTML = hiddenIcon
 	},
-	printingPress: function () {
+	printingPress() {
 		//header information
 		document.querySelector('#print-builder').innerText = DATA.form.builder()
 		document.querySelector('#print-lot').innerText = DATA.form.lot()
@@ -298,16 +318,19 @@ const DRAW = {
 		document.querySelector('#print-total-cost').innerText = '$' + DATA.totalCost()
 		document.querySelector('#print-gross-num').innerText = '$' + DATA.grossProfit().num
 		document.querySelector('#print-gross-perc').innerText = DATA.grossProfit().perc + '%'
-		
+		//materials lines
 		DATA.materials.includes().forEach( x => {
-			let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
+			let item = DRAW.elementFactory('div',{class:'table-entry'})
 			
-			let name = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
-			let qty = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
-			let cost = DRAW.elementFactory('p',[{name:'class',value:'column-3'}])
-			
-			name.innerText = x.name
-			qty.innerText = x.qty
+			let name = DRAW.elementFactory('p',{
+				text: x.name,
+				class:'column-1'
+			})
+			let qty = DRAW.elementFactory('p',{
+				text: x.qty,
+				class:'column-2'
+			})
+			let cost = DRAW.elementFactory('p',{class:'column-3'})
 			cost.innerText = '$' + parseFloat(x.qty * x.cost).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
 			
 			item.appendChild(name)
@@ -315,15 +338,19 @@ const DRAW = {
 			item.appendChild(cost)
 			document.querySelector('#print-materials-table').appendChild(item)
 		})
+		//labor lines
 		DATA.labor.includes().forEach( x => {
-			let item = DRAW.elementFactory('div',[{name:'class',value:'table-entry'}])
+			let item = DRAW.elementFactory('div',{class:'table-entry'})
 			
-			let name = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
-			let qty = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
-			let cost = DRAW.elementFactory('p',[{name:'class',value:'column-3'}])
-			
-			name.innerText = x.name + ' ($' + x.regWage + '/hr)'
-			qty.innerText = x.qty
+			let name = DRAW.elementFactory('p',{
+				text: `${x.name} ($${x.regWage}/hr)`,
+				class:'column-1'
+			})
+			let qty = DRAW.elementFactory('p',{
+				text: x.qty,
+				class:'column-2'
+			})
+			let cost = DRAW.elementFactory('p',{class:'column-3'})
 			cost.innerText = '$' + parseFloat(x.qty * x.regWage).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
 			
 			item.appendChild(name)
@@ -331,8 +358,7 @@ const DRAW = {
 			item.appendChild(cost)
 			document.querySelector('#print-labor-table').appendChild(item)
 		})
-		
-		//materials subtotal, tax
+		//materials sales tax
 		let materialsSubtotal = 0
 		DATA.materials.includes().forEach( x => {
 			materialsSubtotal += (x.qty * x.cost)
@@ -342,18 +368,23 @@ const DRAW = {
 		materialsSubtotal.toFixed(2)
 		salesTax.toFixed(2)
 		
-		let materialsTaxLine = DRAW.elementFactory('div',[{name:'class',value:'table-entry total-line'}])
-		let materialsTaxTitle = DRAW.elementFactory('p',[{name:'class',value:'column-1'}])
-		materialsTaxTitle.innerText = 'Sales Tax'
-		let materialsTaxNumber = DRAW.elementFactory('p',[{name:'class',value:'column-2'}])
-		materialsTaxNumber.innerText = '$' + salesTax
-		materialsTaxLine.appendChild(materialsTaxTitle)
-		materialsTaxLine.appendChild(materialsTaxNumber)
+		let materialsTaxLine = DRAW.elementFactory('div',{class:'table-entry total-line'})
+		materialsTaxLine.appendChild(DRAW.elementFactory('p',{
+			text:'Sales Tax',
+			class:'column-1'
+		}))
+		materialsTaxLine.appendChild(DRAW.elementFactory('p',{
+			text:`$${salesTax}`,
+			class:'column-2'
+		}))
 		
 		document.querySelector('#print-materials-table').appendChild(materialsTaxLine)
 	},
-	collapseAll: function () {
-		console.log('hide...')
+	printingPull() {
+		document.querySelector('#print-labor-table').innerHTML = ''
+		document.querySelector('#print-materials-table').innerHTML = ''
+	},
+	collapseAll() {
 		document.querySelector('#showcollapseBtn').innerText = 'Expand All'
 		document.querySelector('#showcollapseBtn').setAttribute('onClick','DRAW.expandAll()')
 		
@@ -361,8 +392,7 @@ const DRAW = {
 			DRAW.hideSection(x.querySelector('ul'),x.querySelector('button'))
 		})
 	},
-	expandAll: function () {
-		console.log('expand...')
+	expandAll() {
 		document.querySelector('#showcollapseBtn').innerText = 'Collapse All'
 		document.querySelector('#showcollapseBtn').setAttribute('onClick','DRAW.collapseAll()')
 		
@@ -372,53 +402,54 @@ const DRAW = {
 	}
 }
 
+
+
+
 class ITEM {
-	constructor(name, cost, unit, id, section, qty) {
+	constructor(name, section, cost, unit) {
 		this.name = name
+		this.section = section
 		this.cost = cost
 		this.unit = unit
-		this.id = id
-		this.section = section
-		this.qty = ''
+		this.qty = 0.00
 	}
 }
 class RATE {
-	constructor(name, regWage, otWage, id, hours) {
+	constructor(name, regWage, otWage) {
 		this.name = name
 		this.regWage = regWage
 		this.otWage = otWage
-		this.id = id
-		this.qty = ''
 		this.unit = 'hrs'
+		this.qty = 0.00
 	}
 }
 const DATA = {
-	totalCost: function () {
+	totalCost() {
 		let totalCost = parseFloat(DATA.materials.total()) + parseFloat(DATA.labor.total())
 		return totalCost.toFixed(2)
 	},
-	grossProfit: function () {
+	grossProfit() {
 		let num = (DATA.form.billing() - DATA.totalCost()).toFixed(2)
 		let perc = ((num / DATA.form.billing())*100).toFixed(1)
 		
 		return {num:num, perc:perc}
 	},
 	form: {
-		date: function () {
+		date() {
 			let date = new Date(document.querySelector('#date').value)
 			return date
 		},
-		dateString: function () {
+		dateString() {
 			let date = new Date(document.querySelector('#date').value)
 			return (date.getMonth() + 1) + '/' + (date.getDate() + 1) + '/' + date.getFullYear()
 		},
-		builder: function () {
+		builder() {
 			return document.querySelector('#builder').value
 		},
-		lot: function () {
+		lot() {
 			return document.querySelector('#lot').value
 		},
-		billing: function () {
+		billing() {
 			return document.querySelector('#billing').value
 		}
 	},
@@ -426,13 +457,13 @@ const DATA = {
 		name: 'Materials',
 		at: 'Materials?view=Sorted',
 		data: [],
-		parseData: function (data) {
+		parseData(data) {
 			data.forEach( i => {
-				DATA.materials.data.push(new ITEM(i.fields.name, i.fields.cost, i.fields.unit, i.id, i.fields.section, 0))
+				DATA.materials.data.push(new ITEM(i.fields.name, i.fields.section, i.fields.cost, i.fields.unit))
 			})
 		},
 		sections: [['Prewire & Cable', 1],['Cable Ends & Jacks', 1],['Faceplate & Trimout', 2],['Sound, AV, & Automation', 2],['Alarm/Security', 3],['Central Vac', 3]],
-		includes: function () {
+		includes() {
 			let includesData = []
 			DATA.materials.data.forEach( x => {
 				if (x.qty != '' && x.qty != 0 && x.qty != '0') {
@@ -441,7 +472,7 @@ const DATA = {
 			})
 			return includesData
 		},
-		total: function () {
+		total() {
 			let total = 0
 			DATA.materials.includes().forEach( x => {
 				total += (x.qty * x.cost) * 1.06
@@ -453,12 +484,12 @@ const DATA = {
 		name: 'Labor',
 		at: 'Labor?view=Sorted',
 		data: [],
-		parseData: function (data) {
+		parseData(data) {
 			data.forEach( i => {
 				DATA.labor.data.push(new RATE(i.fields.name, i.fields.regular, i.fields.overtime))
 			})
 		},
-		includes: function () {
+		includes() {
 			let includesData = []
 			DATA.labor.data.forEach( x => {
 				if (x.qty != '' && x.qty != 0 && x.qty != '0') {
@@ -467,7 +498,7 @@ const DATA = {
 			})
 			return includesData
 		},
-		total: function () {
+		total() {
 			let total = 0
 			DATA.labor.includes().forEach( x => {
 				total += x.qty * x.regWage
@@ -475,10 +506,10 @@ const DATA = {
 			return total.toFixed(2)
 		}
 	},
-	freshCookies: function () {
+	freshCookies() {
 		return document.cookie
 	},
-	bakeCookies: function (key, value, days) {
+	bakeCookies(key, value, days) {
 		var date = new Date()
 		date.setTime(date.getTime() + (days*24*60*60*1000) )
 		var expires = 'expires='+date.toUTCString()
@@ -488,14 +519,14 @@ const DATA = {
 	},
 	key: {
 		name: 'apiKey',
-		value: function () {
+		value() {
 			let end = DATA.freshCookies().length
 			let i = DATA.freshCookies().indexOf(';', DATA.freshCookies().indexOf(DATA.key.name + '='))
 			if ( i >= 0 ) { end = i }
 			
 			return DATA.freshCookies().slice(DATA.freshCookies().indexOf(DATA.key.name + '=') + DATA.key.name.length + 1, end)
 		},
-		isValid: function () {
+		isValid() {
 			if ( typeof DATA.freshCookies() == 'undefined' || DATA.freshCookies == '' || !DATA.freshCookies().includes(DATA.key.name) || DATA.key.value() == '') {
 				console.log('API Key Doesn\'t Exist')
 				return false
@@ -506,13 +537,13 @@ const DATA = {
 				return true
 			}
 		},
-		renew: function (days) {
+		renew(days) {
 			let keyValue = DATA.key.value()
 			DATA.bakeCookies(DATA.key.name, keyValue, days)
 			console.log('API Key Cookie Extended for 30 Days')
 		}
 	},
-	formatInput: function (type, input) {
+	formatInput(type, input) {
 		let n = input.value
 		
 		if (type != 'whole' && n != '') {
@@ -531,7 +562,7 @@ const DATA = {
 		}
 		return n
 	},
-	mathInline: function (n) {
+	mathInline(n) {
 		if (n.includes('*')) {
 			index = n.search('\\*')
 			term1 = parseFloat(n.substring(0, index) )
@@ -556,8 +587,6 @@ const DATA = {
 		return n
 	}
 }
-
-
 // sections
 let shownIcon = '<i class="bi bi-caret-down-fill"></i>'
 let hiddenIcon = '<i class="bi bi-caret-right-fill"></i>'
