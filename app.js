@@ -108,7 +108,12 @@ const APP = {
 		const event = new Event('input')
 		document.querySelectorAll('input').forEach( (x) => {
 			x.value = ''
-			x.dispatchEvent(event)
+		})
+		DATA.materials.includes().forEach( x => {
+			x.qty = ''
+		})
+		DATA.labor.includes().forEach( x => {
+			x.qty = ''
 		})
 		DRAW.setDatePicker()
 		//clear needs to also clear the qty stored in the data layer
@@ -466,7 +471,7 @@ const DATA = {
 		includes() {
 			let includesData = []
 			DATA.materials.data.forEach( x => {
-				if (x.qty != '' && x.qty != 0 && x.qty != '0') {
+				if (x.qty) {
 					includesData.push(x)
 				}
 			})
@@ -492,7 +497,7 @@ const DATA = {
 		includes() {
 			let includesData = []
 			DATA.labor.data.forEach( x => {
-				if (x.qty != '' && x.qty != 0 && x.qty != '0') {
+				if (x.qty) {
 					includesData.push(x)
 				}
 			})
