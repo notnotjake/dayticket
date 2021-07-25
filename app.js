@@ -203,7 +203,7 @@ const DRAW = {
 			})
 			//button enrolls key
 			button.addEventListener('click', () => {
-				DATA.bakeCookies(DATA.key.name, input.value, 30)
+				DATA.key.bakeCookies(DATA.key.name, input.value, 30)
 				if ( DATA.key.isValid() ) {
 					document.querySelector('.auth-container').remove()
 					APP.getData([DATA.materials,DATA.labor])
@@ -553,28 +553,25 @@ const DATA = {
 			return total.toFixed(2)
 		}
 	},
-	freshCookies() {
-		return document.cookie
-	},
-	bakeCookies(key, value, days) {
-		var date = new Date()
-		date.setTime(date.getTime() + (days*24*60*60*1000) )
-		var expires = 'expires='+date.toUTCString()
-		document.cookie = key + '=' + value + ';' + expires + ';'
-		
-		console.log('API Key Set (' + value + ')')
-	},
 	key: {
 		name: 'apiKey',
 		value() {
-			let end = DATA.freshCookies().length
-			let i = DATA.freshCookies().indexOf(';', DATA.freshCookies().indexOf(DATA.key.name + '='))
-			if ( i >= 0 ) { end = i }
+			if (document.cookie.includes(DATA.key.name)) {
+				let end = document.cookie.length
+				let i = document.cookie.indexOf(';', document.cookie.indexOf(DATA.key.name + '='))
+				if ( i >= 0 ) {
+					end = i
+				}
+				
+				return document.cookie.slice(document.cookie.indexOf(DATA.key.name + '=') + DATA.key.name.length + 1, end)
+			}
+			else {
+				return ''
+			}
 			
-			return DATA.freshCookies().slice(DATA.freshCookies().indexOf(DATA.key.name + '=') + DATA.key.name.length + 1, end)
 		},
 		isValid() {
-			if ( typeof DATA.freshCookies() == 'undefined' || DATA.freshCookies == '' || !DATA.freshCookies().includes(DATA.key.name) || DATA.key.value() == '') {
+			if ( typeof document.cookie == 'undefined' || document.cookie == '' || !document.cookie.includes(DATA.key.name) || DATA.key.value() == '') {
 				console.log('API Key Doesn\'t Exist')
 				return false
 			} else if (DATA.key.value().length < 10 ) {
@@ -584,9 +581,17 @@ const DATA = {
 				return true
 			}
 		},
+		bakeCookies(key, value, days) {
+			var date = new Date()
+			date.setTime(date.getTime() + (days*24*60*60*1000) )
+			var expires = 'expires='+date.toUTCString()
+			document.cookie = key + '=' + value + ';' + expires + ';'
+			
+			console.log('API Key Set (' + value + ')')
+		},
 		renew(days) {
 			let keyValue = DATA.key.value()
-			DATA.bakeCookies(DATA.key.name, keyValue, days)
+			DATA.key.bakeCookies(DATA.key.name, keyValue, days)
 			console.log('API Key Cookie Extended for 30 Days')
 		}
 	},
