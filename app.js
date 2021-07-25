@@ -62,7 +62,7 @@ const APP = {
 		DATA.key.renew(30)
 		DRAW.connectedStatus()
 		DRAW.setToolbarActive()
-		//DRAW.addSingleUse()
+		DRAW.addAddItemSection()
 	},
 	renderData(dataObj) {
 		if (dataObj.name == 'Materials') {
@@ -228,19 +228,59 @@ const DRAW = {
 		}
 		document.querySelector('#new-auth-key').select()
 	},
-	addSingleUse() {
+	addAddItemSection() {
 		let section = DRAW.elementFactory('div', {class:'section-table'})
 		let sectionHeader = DRAW.elementFactory('h1', {
-			text:'Single Use Items',
-			class:''
+			html:'<button></button>Add Item',
+			class:'add-item'
 		})
 		section.appendChild(sectionHeader)
-		document.querySelector('#column-4').insertAdjacentElement('beforeend', section)
+		
+		let sectionList = DRAW.elementFactory('ul', {class:'section-list'})
+		
+		let addNew = document.createElement('label')
+		let addNewLi = document.createElement('li')
+		let buttonWrapper = DRAW.elementFactory('div', {class:'new-item-buttons'})
+		let addMaterial = DRAW.elementFactory('button', {
+			text:'Material',
+			disabled:'true'
+		})
+		let addLabor = DRAW.elementFactory('button', {
+			text:'Labor',
+			disabled:'true'
+		})
+		
+		buttonWrapper.appendChild(addMaterial)
+		buttonWrapper.appendChild(addLabor)
+		addNewLi.appendChild(buttonWrapper)
+		addNew.appendChild(addNewLi)
+		sectionList.appendChild(addNew)
+		section.appendChild(sectionList)
+		
+		document.querySelector('#column-4').insertAdjacentElement('afterbegin', section)
 	},
 	addSection(column, name, data, headerClass) {
 		let section = DRAW.elementFactory('div', {class:'section-table'})
+		//header
+		let sectionHeader = DRAW.elementFactory('h1', {
+			text: name,
+			class: headerClass
+		})
+		let expandButton = DRAW.elementFactory('button', {
+			html: shownIcon,
+			class:'expand-button'
+		})
+		expandButton.addEventListener('click', () => {
+			if (sectionList.style.display == 'block') {
+				DRAW.hideSection(sectionList, expandButton)
+			} else {
+				DRAW.showSection(sectionList, expandButton)
+			}
+		})
+		sectionHeader.insertAdjacentElement('afterbegin', expandButton)
+		section.appendChild(sectionHeader)
+		//items
 		let sectionList = DRAW.elementFactory('ul', {class:'section-list'})
-
 		data.forEach( x => {
 			let placeholderText = ''
 			if (x.unit == 'whole') {
@@ -277,26 +317,6 @@ const DRAW = {
 		})
 		sectionList.style.display = 'block'
 		
-		let sectionHeader = DRAW.elementFactory('h1', {
-			text: name,
-			class: headerClass
-		})
-		
-		let expandButton = DRAW.elementFactory('button', {
-			html: shownIcon,
-			class:'expand-button'
-		})
-		expandButton.addEventListener('click', () => {
-			if (sectionList.style.display == 'block') {
-				DRAW.hideSection(sectionList, expandButton)
-			} else {
-				DRAW.showSection(sectionList, expandButton)
-			}
-		})
-		
-		sectionHeader.insertAdjacentElement('afterbegin', expandButton)
-		
-		section.appendChild(sectionHeader)
 		section.appendChild(sectionList)
 		
 		document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
