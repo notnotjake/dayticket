@@ -80,6 +80,15 @@ const APP = {
 			DRAW.addSection(4,dataObj.name,dataObj.data,'labor')
 		}
 	},
+	keepUpdated(watch, update) {
+		watch.addEventListener('blur', () => {
+			
+		})
+		
+		itemInput.addEventListener('blur', () => {
+			x.qty = DATA.formatInput(x.unit, itemInput)
+		})
+	},
 	printButton() {
 		document.title = 'Dayticket_' + DATA.form.builder() + '_Lot-' + DATA.form.lot() +'_' + DATA.form.dateString()
 		DRAW.printingPress()
@@ -337,8 +346,14 @@ const DRAW = {
 				text: x.name,
 				class:'column-1'
 			})
+			
+			let placeholderText = ''
+			if (x.unit != 'whole') {
+				placeholderText = ' ' + x.unit
+			}
+			
 			let qty = DRAW.elementFactory('p',{
-				text: x.qty,
+				text: `${x.qty}${placeholderText}`,
 				class:'column-2'
 			})
 			let cost = DRAW.elementFactory('p',{class:'column-3'})
