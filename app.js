@@ -300,19 +300,29 @@ const DRAW = {
 		section.style.display = 'none'
 		button.innerHTML = hiddenIcon
 	},
+	printReadyCurrency(n) {
+		if (n) {
+			let string = '$'
+			string += parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+			return string
+		}
+		else {
+			return '-'
+		}
+	},
 	printingPress() {
 		//header information
 		document.querySelector('#print-builder').innerText = DATA.form.builder()
 		document.querySelector('#print-lot').innerText = DATA.form.lot()
 		document.querySelector('#print-date').innerText = DATA.form.dateString()
 		//summary section
-		document.querySelector('#print-billed').innerText = ((DATA.form.billing()) ? `$${DATA.form.billing()}` : '-')		
+		document.querySelector('#print-billed').innerText = DRAW.printReadyCurrency(DATA.form.billing())
 		document.querySelector('#print-labor-total').innerText = '$' + DATA.labor.total()
 		document.querySelector('#print-materials-total').innerText = '$' + DATA.materials.total()
 		document.querySelector('#print-total-cost').innerText = '$' + DATA.totalCost()
 		
 		if (DATA.form.billing()) {
-			document.querySelector('#print-gross-num').innerText = '$' + DATA.grossProfit().num
+			document.querySelector('#print-gross-num').innerText = DRAW.printReadyCurrency(DATA.grossProfit().num)
 			document.querySelector('#print-gross-perc').innerText = DATA.grossProfit().perc + '%'
 		}
 		else {
@@ -438,7 +448,7 @@ const DATA = {
 			return document.querySelector('#lot').value
 		},
 		billing() {
-			return document.querySelector('#billing').value
+			return DATA.formatInput('number', document.querySelector('#billing'))
 		}
 	},
 	materials: {
@@ -547,8 +557,8 @@ const DATA = {
 				n = n.substring(0, index) + n.substring(index+1)
 			}
 			n = DATA.mathInline(n)
-			input.value = parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
 			n = parseFloat(n)
+			input.value = n.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
 		}
 		if (type == 'whole' && n != '') {
 			n = DATA.mathInline(n.toString())
