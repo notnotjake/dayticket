@@ -14,8 +14,8 @@ Created by [Jake Gooch](https://www.notnotjake.com) for [Advance](https://www.ad
 
 
 ## 💡 Functionality
-- Enter time ticket data (in-progress)
-- Print a report of costs (not implemented)
+- Enter time ticket data
+- Print a report of costs
 - Export report to QuickBooks IIF Bill file format (not implemented)
 
 ## 🛠 Architecture
