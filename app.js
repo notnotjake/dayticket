@@ -306,12 +306,19 @@ const DRAW = {
 		document.querySelector('#print-lot').innerText = DATA.form.lot()
 		document.querySelector('#print-date').innerText = DATA.form.dateString()
 		//summary section
-		document.querySelector('#print-billed').innerText = '$' + DATA.form.billing()
+		document.querySelector('#print-billed').innerText = ((DATA.form.billing()) ? `$${DATA.form.billing()}` : '-')		
 		document.querySelector('#print-labor-total').innerText = '$' + DATA.labor.total()
 		document.querySelector('#print-materials-total').innerText = '$' + DATA.materials.total()
 		document.querySelector('#print-total-cost').innerText = '$' + DATA.totalCost()
-		document.querySelector('#print-gross-num').innerText = '$' + DATA.grossProfit().num
-		document.querySelector('#print-gross-perc').innerText = DATA.grossProfit().perc + '%'
+		
+		if (DATA.form.billing()) {
+			document.querySelector('#print-gross-num').innerText = '$' + DATA.grossProfit().num
+			document.querySelector('#print-gross-perc').innerText = DATA.grossProfit().perc + '%'
+		}
+		else {
+			document.querySelector('#print-gross-num').innerText = '-'
+			document.querySelector('#print-gross-perc').innerText = '-'
+		}
 		//materials lines
 		DATA.materials.includes().forEach( x => {
 			let item = DRAW.elementFactory('div',{class:'table-entry'})
