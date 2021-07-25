@@ -94,7 +94,6 @@ const APP = {
 		DRAW.printingPress()
 		window.print()
 		document.title = 'Dayticket Entry'
-		DRAW.printingPull()
 	},
 	exportButton() {
 		download('test.txt', 'hello world')
@@ -358,6 +357,10 @@ const DRAW = {
 			document.querySelector('#print-gross-num').innerText = '-'
 			document.querySelector('#print-gross-perc').innerText = '-'
 		}
+		//empty out sections
+		document.querySelector('#print-labor-table').innerHTML = ''
+		document.querySelector('#print-materials-table').innerHTML = ''
+		
 		//materials lines
 		DATA.materials.includes().forEach( x => {
 			let item = DRAW.elementFactory('div',{class:'table-entry'})
@@ -415,10 +418,6 @@ const DRAW = {
 			class:'column-2'
 		}))
 		document.querySelector('#print-materials-table').appendChild(materialsTaxLine)
-	},
-	printingPull() {
-		document.querySelector('#print-labor-table').innerHTML = ''
-		document.querySelector('#print-materials-table').innerHTML = ''
 	},
 	collapseAll() {
 		document.querySelector('#showcollapseBtn').innerText = 'Expand All'
