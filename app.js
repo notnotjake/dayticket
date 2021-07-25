@@ -118,17 +118,6 @@ const APP = {
 		DRAW.setDatePicker()
 		//clear needs to also clear the qty stored in the data layer
 	},
-	statusInternal: '',
-	set status(val) {
-		this.statusInternal = val
-		this.listener(val)
-	},
-	get status() {
-		return this.statusInternal
-	},
-	listener(val) {
-		console.log('Status set ' + val)
-	}
 }
 const DRAW = {
 	elementFactory(elem, options) {
@@ -364,25 +353,15 @@ const DRAW = {
 			document.querySelector('#print-labor-table').appendChild(item)
 		})
 		//materials sales tax
-		let materialsSubtotal = 0
-		DATA.materials.includes().forEach( x => {
-			materialsSubtotal += (x.qty * x.cost)
-		})
-		let salesTax = materialsSubtotal * 0.06
-		
-		materialsSubtotal.toFixed(2)
-		salesTax.toFixed(2)
-		
 		let materialsTaxLine = DRAW.elementFactory('div',{class:'table-entry total-line'})
 		materialsTaxLine.appendChild(DRAW.elementFactory('p',{
 			text:'Sales Tax',
 			class:'column-1'
 		}))
 		materialsTaxLine.appendChild(DRAW.elementFactory('p',{
-			text:`$${salesTax}`,
+			text:`$${DATA.materials.salesTax()}`,
 			class:'column-2'
 		}))
-		
 		document.querySelector('#print-materials-table').appendChild(materialsTaxLine)
 	},
 	printingPull() {
@@ -406,9 +385,6 @@ const DRAW = {
 		})
 	}
 }
-
-
-
 
 class ITEM {
 	constructor(name, section, cost, unit) {
@@ -483,6 +459,13 @@ const DATA = {
 				total += (x.qty * x.cost) * 1.06
 			})
 			return total.toFixed(2)
+		},
+		salesTax() {
+			let tax = 0
+			DATA.materials.includes().forEach( x => {
+				tax += (x.qty * x.cost) * 0.06
+			})
+			return tax.toFixed(2)
 		}
 	},
 	labor: {
@@ -595,5 +578,4 @@ const DATA = {
 // sections
 let shownIcon = '<i class="bi bi-caret-down-fill"></i>'
 let hiddenIcon = '<i class="bi bi-caret-right-fill"></i>'
-
 APP.init()
