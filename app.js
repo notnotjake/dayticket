@@ -227,7 +227,7 @@ const DRAW = {
 		document.querySelector('#new-auth-key').select()
 	},
 	addAddItemSection() {
-		let section = DRAW.elementFactory('div', {class:'section-table'})
+		let section = DRAW.elementFactory('div', {class:'section-table add-items'})
 		let sectionHeader = DRAW.elementFactory('h1', {
 			html:'<button></button>Add Item',
 			class:'add-item'
@@ -428,7 +428,9 @@ const DRAW = {
 		document.querySelector('#showcollapseBtn').setAttribute('onClick','DRAW.expandAll()')
 		
 		document.querySelectorAll('.section-table').forEach( x => {
-			DRAW.hideSection(x.querySelector('ul'),x.querySelector('button'))
+			if ( !x.classList.value.includes('add-items') ) {
+				DRAW.hideSection(x.querySelector('ul'),x.querySelector('button'))
+			}
 		})
 	},
 	expandAll() {
@@ -436,7 +438,9 @@ const DRAW = {
 		document.querySelector('#showcollapseBtn').setAttribute('onClick','DRAW.collapseAll()')
 		
 		document.querySelectorAll('.section-table').forEach( x => {
-			DRAW.showSection(x.querySelector('ul'),x.querySelector('button'))
+			if ( !x.classList.value.includes('add-items') ) {
+				DRAW.showSection(x.querySelector('ul'),x.querySelector('button'))
+			}
 		})
 	}
 }
