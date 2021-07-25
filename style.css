@@ -453,6 +453,13 @@ i {
 		width: 1.25in;
 		text-align: right;
 	}
+	
+	#print-labor-table .table-entry:nth-child(even) {
+		background-color: #f0f0f0;
+	}
+	#print-materials-table .table-entry:nth-child(even) {
+		background-color: #f0f0f0;
+	}
 }
 
 
