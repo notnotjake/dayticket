@@ -176,7 +176,6 @@ const DRAW = {
 				html:'<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>',
 				class:'auth-container'
 			})
-
 			let form = DRAW.elementFactory('div', {class:'new-auth'})
 			let input = DRAW.elementFactory('input', {
 				type:'text',
@@ -256,7 +255,7 @@ const DRAW = {
 		sectionList.appendChild(addNew)
 		section.appendChild(sectionList)
 		
-		document.querySelector('#column-4').insertAdjacentElement('afterbegin', section)
+		document.querySelector('#column-4').insertAdjacentElement('beforeend', section)
 	},
 	addSection(column, name, data, headerClass) {
 		let section = DRAW.elementFactory('div', {class:'section-table'})
@@ -318,7 +317,12 @@ const DRAW = {
 		
 		section.appendChild(sectionList)
 		
-		document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
+		if (headerClass == 'labor') {
+			document.querySelector('#column-' + column).insertAdjacentElement('afterbegin', section)
+		}
+		else {
+			document.querySelector('#column-' + column).insertAdjacentElement('beforeend', section)
+		}
 	},
 	showSection(section, button) {
 		section.style.display = 'block'
