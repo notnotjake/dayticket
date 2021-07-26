@@ -62,7 +62,8 @@ const APP = {
 		DATA.key.renew(30)
 		DRAW.connectedStatus()
 		DRAW.setToolbarActive()
-		DRAW.addAddItemSection()
+		//DRAW.addAddItemSection()
+		DRAW.showAddItemSection()
 	},
 	renderData(dataObj) {
 		if (dataObj.name == 'Materials') {
@@ -225,6 +226,9 @@ const DRAW = {
 			document.querySelector('#auth-help').innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>' + condition
 		}
 		document.querySelector('#new-auth-key').select()
+	},
+	showAddItemSection() {
+		document.querySelector('.add-items').style.display = 'block'
 	},
 	addAddItemSection() {
 		let section = DRAW.elementFactory('div', {class:'section-table add-items'})
