@@ -12,6 +12,7 @@ const APP = {
 	getData(dataObjList) {
 		let helpText = ''
 		let firstTime = true
+		let firstError = true
 				
 		dataObjList.forEach( (dataObj) => {
 			const reqURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' + encodeURI(dataObj.at)
@@ -24,22 +25,22 @@ const APP = {
 				}
 			})
 			reqPromise
-				.then(response => {
-					if (response.status == 401) {
+				.then(res => {
+					if (res.status == 401) {
 						helpText = 'Key Rejected'
 						throw Error("Authentication Error")
-					} else if (response.status == 404) {
+					} else if (res.status == 404) {
 						helpText = 'Couldn\'t Connect to Server'
 						throw Error("Record Not Found")
-					} else if (!response.ok) {
+					} else if (!res.ok) {
 						helpText = 'Something Went Wrong'
 						throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
 					} else {
-						return response.json()
+						return res.json()
 					}
 				})
-				.then(responseData => {
-					dataObj.parseData(responseData.records)
+				.then(resData => {
+					dataObj.parseData(resData.records)
 					console.log(dataObj.name + ' Data Retrieved Successfully:')
 					APP.renderData(dataObj)
 					
@@ -49,12 +50,12 @@ const APP = {
 					}
 				})
 				.catch(err => {
-					if (firstTime) {
+					if (firstError) {
 						DRAW.auth()
 						DRAW.auth(helpText)
-						firstTime = false
+						firstError = false
 					}
-					console.log(err)
+					console.error(err)
 				})
 		})
 	},
@@ -172,7 +173,11 @@ const DRAW = {
 		dateField.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0)
 	},
 	auth(condition) {
-		if (typeof condition == 'undefined') {
+		if (condition) {
+			document.querySelector('#new-auth-key').value = DATA.key.value()
+			document.querySelector('#auth-help').innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>' + condition
+		}
+		else {
 			let authForm = DRAW.elementFactory('div', {
 				html:'<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>',
 				class:'auth-container'
@@ -221,50 +226,80 @@ const DRAW = {
 			
 			document.querySelector('.app-controls').insertAdjacentElement('afterbegin', authForm)
 		}
-		else {
-			document.querySelector('#new-auth-key').value = DATA.key.value()
-			document.querySelector('#auth-help').innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>' + condition
-		}
+		
 		document.querySelector('#new-auth-key').select()
 	},
 	showAddItemSection() {
 		document.querySelector('.add-items').style.display = 'block'
 	},
-	addAddItemSection() {
-		let section = DRAW.elementFactory('div', {class:'section-table add-items'})
-		let sectionHeader = DRAW.elementFactory('h1', {
-			html:'<button></button>Add Item',
-			class:'add-item'
-		})
-		section.appendChild(sectionHeader)
+	addNewItem() {
+		let itemDataObj = DATA.userAdded.newItem()
+		itemDataObj.name = 'Testing'
 		
-		let sectionList = DRAW.elementFactory('ul', {class:'section-list add-items-list'})
-		
-		let addNew = document.createElement('label')
-		let addNewLi = document.createElement('li')
-		let buttonWrapper = DRAW.elementFactory('div', {class:'new-item-buttons'})
-		let addMaterial = DRAW.elementFactory('button', {
-			text:'Material'
+		let sectionList = document.querySelector('.add-items-list')
+		//basic strutcure
+		let item = document.createElement('label')
+		let itemLi = document.createElement('li')
+		let inputWrapper = DRAW.elementFactory('div',{class:'item-container-new'})
+		//controls
+		let seperator = DRAW.elementFactory('div',{class:'input-seperator-pill'})
+		let seperator2 = DRAW.elementFactory('div',{class:'input-seperator-pill'})
+		let qtyInput = DRAW.elementFactory('input',{
+			type:'number',
+			step:'0.01',
+			min:'0',
+			class:'qty',
+			onclick:'select()',
+			inputmode:'decimal',
+			placeholder:'Qty'
 		})
-		let addLabor = DRAW.elementFactory('button', {
-			text:'Labor'
+		qtyInput.addEventListener('blur', () => {
+			itemDataObj.qty = qtyInput.value
+		})
+		let nameInput = DRAW.elementFactory('input',{
+			type:'text',
+			class:'name',
+			onclick:'select()',
+			placeholder:'Name'
+		})
+		nameInput.addEventListener('blur', () => {
+			itemDataObj.name = nameInput.value
+		})
+		let costInput = DRAW.elementFactory('input',{
+			type:'number',
+			step:'0.01',
+			min:'0',
+			class:'cost',
+			onclick:'select()',
+			placeholder:'Cost'
+		})
+		costInput.addEventListener('blur', () => {
+			itemDataObj.cost = costInput.value
+		})
+		let unitInput = DRAW.elementFactory('select',{
+			html:`
+				<optgroup name="Materials" label="Materials">
+					<option value="materials">/ unit</option>
+					<option value="ft">/ ft</option>
+				</optgroup>
+				<optgroup name="Labor" label="Labor">
+					<option value="labor">/ hr</option>
+				</optgroup>
+			`,
+			class:'unit-select'
 		})
 		
-		addMaterial.addEventListener('click', () => {
-			DRAW.addSingleUse('material')
-		})
-		addLabor.addEventListener('click', () => {
-			DRAW.addSingleUse('labor')
-		})
+		inputWrapper.appendChild(qtyInput)
+		inputWrapper.appendChild(seperator2)
+		inputWrapper.appendChild(nameInput)
+		inputWrapper.appendChild(seperator)
+		inputWrapper.appendChild(costInput)
+		inputWrapper.appendChild(unitInput)
 		
-		buttonWrapper.appendChild(addMaterial)
-		buttonWrapper.appendChild(addLabor)
-		addNewLi.appendChild(buttonWrapper)
-		addNew.appendChild(addNewLi)
-		sectionList.appendChild(addNew)
-		section.appendChild(sectionList)
+		itemLi.appendChild(inputWrapper)
+		item.appendChild(itemLi)
 		
-		document.querySelector('#column-4').insertAdjacentElement('beforeend', section)
+		sectionList.insertAdjacentElement('afterbegin', item)
 	},
 	addSingleUse(type) {
 		let sectionList = document.querySelector('.add-items-list')
@@ -332,7 +367,7 @@ const DRAW = {
 			class: headerClass
 		})
 		let expandButton = DRAW.elementFactory('button', {
-			html: shownIcon,
+			html: '<i class="bi bi-caret-down-fill"></i>',
 			class:'expand-button'
 		})
 		expandButton.addEventListener('click', () => {
@@ -393,11 +428,11 @@ const DRAW = {
 	},
 	showSection(section, button) {
 		section.style.display = 'block'
-		button.innerHTML = shownIcon
+		button.innerHTML = '<i class="bi bi-caret-down-fill"></i>'
 	},
 	hideSection(section, button) {
 		section.style.display = 'none'
-		button.innerHTML = hiddenIcon
+		button.innerHTML = '<i class="bi bi-caret-right-fill"></i>'
 	},
 	printReadyCurrency(n) {
 		if (n) {
@@ -620,6 +655,14 @@ const DATA = {
 			return total.toFixed(2)
 		}
 	},
+	userAdded: {
+		data: [],
+		newItem(elem) {
+			let newItem = new ITEM('','',0,'whole')
+			DATA.userAdded.data.push(newItem)
+			return newItem
+		}
+	},
 	key: {
 		name: 'apiKey',
 		value() {
@@ -706,7 +749,5 @@ const DATA = {
 		return n
 	}
 }
-// sections
-let shownIcon = '<i class="bi bi-caret-down-fill"></i>'
-let hiddenIcon = '<i class="bi bi-caret-right-fill"></i>'
+
 APP.init()
