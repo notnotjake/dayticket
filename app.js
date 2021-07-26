@@ -63,7 +63,6 @@ const APP = {
 		DATA.key.renew(30)
 		DRAW.connectedStatus()
 		DRAW.setToolbarActive()
-		//DRAW.addAddItemSection()
 		DRAW.showAddItemSection()
 	},
 	renderData(dataObj) {
@@ -279,14 +278,17 @@ const DRAW = {
 		let unitInput = DRAW.elementFactory('select',{
 			html:`
 				<optgroup name="Materials" label="Materials">
-					<option value="materials">/ unit</option>
+					<option value="whole">/ unit</option>
 					<option value="ft">/ ft</option>
 				</optgroup>
 				<optgroup name="Labor" label="Labor">
-					<option value="labor">/ hr</option>
+					<option value="hrs">/ hr</option>
 				</optgroup>
 			`,
 			class:'unit-select'
+		})
+		unitInput.addEventListener('change', () => {
+			itemDataObj.unit = unitInput.value
 		})
 		
 		inputWrapper.appendChild(qtyInput)
@@ -493,6 +495,7 @@ const DRAW = {
 			item.appendChild(cost)
 			document.querySelector('#print-materials-table').appendChild(item)
 		})
+		
 		//labor lines
 		DATA.labor.includes().forEach( x => {
 			let item = DRAW.elementFactory('div',{class:'table-entry'})
@@ -544,6 +547,16 @@ const DRAW = {
 				DRAW.showSection(x.querySelector('ul'),x.querySelector('button'))
 			}
 		})
+	}
+}
+
+class ITEM_unified {
+	constructor(name, section, cost, unit) {
+		this.name = name
+		this.section = section
+		this.cost = cost
+		this.unit = unit
+		this.qty = 0.00
 	}
 }
 
@@ -612,6 +625,9 @@ const DATA = {
 					includesData.push(x)
 				}
 			})
+			DATA.userAdded.includes().materials.forEach( x => {
+				includesData.push(x)
+			})
 			return includesData
 		},
 		total() {
@@ -645,6 +661,9 @@ const DATA = {
 					includesData.push(x)
 				}
 			})
+			DATA.userAdded.includes().labor.forEach( x => {
+				includesData.push(x)
+			})
 			return includesData
 		},
 		total() {
@@ -657,10 +676,34 @@ const DATA = {
 	},
 	userAdded: {
 		data: [],
-		newItem(elem) {
-			let newItem = new ITEM('','',0,'whole')
+		newItem() {
+			let newItem = {
+				name:'',
+				cost:0,
+				qty:0,
+				unit:'whole',
+			}
 			DATA.userAdded.data.push(newItem)
 			return newItem
+		},
+		includes() {
+			let includesDataLabor = []
+			let includesDataMaterials = []
+			DATA.userAdded.data.forEach( x => {
+				if (x.name && x.cost && x.qty) {
+					if (x.unit === 'whole' || x.unit === 'ft') {
+						let xMaterial = new ITEM(x.name,'',x.cost,x.unit)
+						xMaterial.qty = x.qty
+						includesDataMaterials.push(xMaterial)
+					}
+					else if (x.unit === 'hrs') {
+						let xLabor = new RATE(x.name,x.cost,'')
+						xLabor.qty = x.qty
+						includesDataLabor.push(xLabor)
+					}
+				}
+			})
+			return {materials:includesDataMaterials,labor:includesDataLabor}
 		}
 	},
 	key: {
