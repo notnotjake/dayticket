@@ -291,7 +291,7 @@ i {
 	margin: 0;
 }
 .unit-select {
-	width: 56px;
+	width: 57px;
 	//height: 23px;
 	margin-left: 3px;
 	font-size: 13px;
@@ -304,6 +304,7 @@ i {
 	background-color: #f0efeb;
 	overflow-x: auto;
 	width: 100%;
+	padding-right: 3px;
 }
 .add-items-list input.qty {
 	width: 50px;
