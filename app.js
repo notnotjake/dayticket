@@ -62,7 +62,7 @@ const APP = {
 		DATA.key.renew(30)
 		DRAW.connectedStatus()
 		DRAW.setToolbarActive()
-		DRAW.addAddItemSection()
+		//DRAW.addAddItemSection()
 	},
 	renderData(dataObj) {
 		if (dataObj.name == 'Materials') {
