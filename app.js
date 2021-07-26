@@ -234,18 +234,23 @@ const DRAW = {
 		})
 		section.appendChild(sectionHeader)
 		
-		let sectionList = DRAW.elementFactory('ul', {class:'section-list'})
+		let sectionList = DRAW.elementFactory('ul', {class:'section-list add-items-list'})
 		
 		let addNew = document.createElement('label')
 		let addNewLi = document.createElement('li')
 		let buttonWrapper = DRAW.elementFactory('div', {class:'new-item-buttons'})
 		let addMaterial = DRAW.elementFactory('button', {
-			text:'Material',
-			disabled:'true'
+			text:'Material'
 		})
 		let addLabor = DRAW.elementFactory('button', {
-			text:'Labor',
-			disabled:'true'
+			text:'Labor'
+		})
+		
+		addMaterial.addEventListener('click', () => {
+			DRAW.addSingleUse('material')
+		})
+		addLabor.addEventListener('click', () => {
+			DRAW.addSingleUse('labor')
 		})
 		
 		buttonWrapper.appendChild(addMaterial)
@@ -256,6 +261,64 @@ const DRAW = {
 		section.appendChild(sectionList)
 		
 		document.querySelector('#column-4').insertAdjacentElement('beforeend', section)
+	},
+	addSingleUse(type) {
+		let sectionList = document.querySelector('.add-items-list')
+		
+		let item = document.createElement('label')
+		let itemLi = document.createElement('li')
+		let inputWrapper = document.createElement('div')
+		let qtyInput = DRAW.elementFactory('input', {
+			type:'number',
+			step:'0.01',
+			min:'0',
+			class:'qty',
+			onclick:'select()',
+			inputmode:'decimal',
+			placeholder: 'Qty',
+		})
+		qtyInput.addEventListener('blur', () => {
+			DATA.formatInput('currency', qtyInput)
+			console.log('New Item: ' + qtyInput.value)
+		})
+		
+		let nameInput = DRAW.elementFactory('input', {
+			type:'text',
+			class:'qty',
+			onclick:'select()',
+			placeholder: 'Name',
+		})
+		let costInput = DRAW.elementFactory('input', {
+			type:'number',
+			step:'0.01',
+			min:'0',
+			class:'qty',
+			onclick:'select()',
+			placeholder: 'Cost',
+		})
+		costInput.addEventListener('blur', () => {
+			DATA.formatInput('currency', costInput)
+			console.log('Cost: ' + costInput.value)
+		})
+		let unitSelect = DRAW.elementFactory('select',{
+			html: `
+			<optgroup name="Materials" label="Materials">
+				<option value="materials">Unit</option>
+				<option value="ft">Foot</option>
+			</optgroup>
+			<optgroup name="Labor" label="Labor">
+				<option value="labor">Hour</option>
+			</optgroup>`
+		})
+		
+		inputWrapper.appendChild(qtyInput)
+		inputWrapper.appendChild(nameInput)
+		inputWrapper.appendChild(costInput)
+		inputWrapper.appendChild(unitSelect)
+		itemLi.appendChild(inputWrapper)
+		item.appendChild(itemLi)
+		
+		sectionList.insertAdjacentElement('afterbegin', item)
 	},
 	addSection(column, name, data, headerClass) {
 		let section = DRAW.elementFactory('div', {class:'section-table'})
