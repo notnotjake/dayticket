@@ -12,6 +12,7 @@ const APP = {
 	getData(dataObjList) {
 		let helpText = ''
 		let firstTime = true
+		let firstError = true
 				
 		dataObjList.forEach( (dataObj) => {
 			const reqURL = 'https://api.airtable.com/v0/app9sUZzisuGNjntz/' + encodeURI(dataObj.at)
@@ -24,22 +25,22 @@ const APP = {
 				}
 			})
 			reqPromise
-				.then(response => {
-					if (response.status == 401) {
+				.then(res => {
+					if (res.status == 401) {
 						helpText = 'Key Rejected'
 						throw Error("Authentication Error")
-					} else if (response.status == 404) {
+					} else if (res.status == 404) {
 						helpText = 'Couldn\'t Connect to Server'
 						throw Error("Record Not Found")
-					} else if (!response.ok) {
+					} else if (!res.ok) {
 						helpText = 'Something Went Wrong'
 						throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
 					} else {
-						return response.json()
+						return res.json()
 					}
 				})
-				.then(responseData => {
-					dataObj.parseData(responseData.records)
+				.then(resData => {
+					dataObj.parseData(resData.records)
 					console.log(dataObj.name + ' Data Retrieved Successfully:')
 					APP.renderData(dataObj)
 					
@@ -49,12 +50,12 @@ const APP = {
 					}
 				})
 				.catch(err => {
-					if (firstTime) {
+					if (firstError) {
 						DRAW.auth()
 						DRAW.auth(helpText)
-						firstTime = false
+						firstError = false
 					}
-					console.log(err)
+					console.error(err)
 				})
 		})
 	},
@@ -62,7 +63,7 @@ const APP = {
 		DATA.key.renew(30)
 		DRAW.connectedStatus()
 		DRAW.setToolbarActive()
-		//DRAW.addAddItemSection()
+		DRAW.showAddItemSection()
 	},
 	renderData(dataObj) {
 		if (dataObj.name == 'Materials') {
@@ -171,7 +172,11 @@ const DRAW = {
 		dateField.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0)
 	},
 	auth(condition) {
-		if (typeof condition == 'undefined') {
+		if (condition) {
+			document.querySelector('#new-auth-key').value = DATA.key.value()
+			document.querySelector('#auth-help').innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>' + condition
+		}
+		else {
 			let authForm = DRAW.elementFactory('div', {
 				html:'<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>',
 				class:'auth-container'
@@ -220,42 +225,141 @@ const DRAW = {
 			
 			document.querySelector('.app-controls').insertAdjacentElement('afterbegin', authForm)
 		}
-		else {
-			document.querySelector('#new-auth-key').value = DATA.key.value()
-			document.querySelector('#auth-help').innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>' + condition
-		}
+		
 		document.querySelector('#new-auth-key').select()
 	},
-	addAddItemSection() {
-		let section = DRAW.elementFactory('div', {class:'section-table add-items'})
-		let sectionHeader = DRAW.elementFactory('h1', {
-			html:'<button></button>Add Item',
-			class:'add-item'
+	showAddItemSection() {
+		document.querySelector('.add-items').style.display = 'block'
+	},
+	addNewItem() {
+		let itemDataObj = DATA.userAdded.newItem()
+		itemDataObj.name = 'Testing'
+		
+		let sectionList = document.querySelector('.add-items-list')
+		//basic strutcure
+		let item = document.createElement('label')
+		let itemLi = document.createElement('li')
+		let inputWrapper = DRAW.elementFactory('div',{class:'item-container-new'})
+		//controls
+		let seperator = DRAW.elementFactory('div',{class:'input-seperator-pill'})
+		let seperator2 = DRAW.elementFactory('div',{class:'input-seperator-pill'})
+		let qtyInput = DRAW.elementFactory('input',{
+			type:'number',
+			step:'0.01',
+			min:'0',
+			class:'qty',
+			onclick:'select()',
+			inputmode:'decimal',
+			placeholder:'Qty'
 		})
-		section.appendChild(sectionHeader)
-		
-		let sectionList = DRAW.elementFactory('ul', {class:'section-list'})
-		
-		let addNew = document.createElement('label')
-		let addNewLi = document.createElement('li')
-		let buttonWrapper = DRAW.elementFactory('div', {class:'new-item-buttons'})
-		let addMaterial = DRAW.elementFactory('button', {
-			text:'Material',
-			disabled:'true'
+		qtyInput.addEventListener('blur', () => {
+			itemDataObj.qty = qtyInput.value
 		})
-		let addLabor = DRAW.elementFactory('button', {
-			text:'Labor',
-			disabled:'true'
+		let nameInput = DRAW.elementFactory('input',{
+			type:'text',
+			class:'name',
+			onclick:'select()',
+			placeholder:'Name'
+		})
+		nameInput.addEventListener('blur', () => {
+			itemDataObj.name = nameInput.value
+		})
+		let costInput = DRAW.elementFactory('input',{
+			type:'number',
+			step:'0.01',
+			min:'0',
+			class:'cost',
+			onclick:'select()',
+			placeholder:'Cost'
+		})
+		costInput.addEventListener('blur', () => {
+			itemDataObj.cost = costInput.value
+		})
+		let unitInput = DRAW.elementFactory('select',{
+			html:`
+				<optgroup name="Materials" label="Materials">
+					<option value="whole">/ unit</option>
+					<option value="ft">/ ft</option>
+				</optgroup>
+				<optgroup name="Labor" label="Labor">
+					<option value="hrs">/ hr</option>
+				</optgroup>
+			`,
+			class:'unit-select'
+		})
+		unitInput.addEventListener('change', () => {
+			itemDataObj.unit = unitInput.value
 		})
 		
-		buttonWrapper.appendChild(addMaterial)
-		buttonWrapper.appendChild(addLabor)
-		addNewLi.appendChild(buttonWrapper)
-		addNew.appendChild(addNewLi)
-		sectionList.appendChild(addNew)
-		section.appendChild(sectionList)
+		inputWrapper.appendChild(qtyInput)
+		inputWrapper.appendChild(seperator2)
+		inputWrapper.appendChild(nameInput)
+		inputWrapper.appendChild(seperator)
+		inputWrapper.appendChild(costInput)
+		inputWrapper.appendChild(unitInput)
 		
-		document.querySelector('#column-4').insertAdjacentElement('beforeend', section)
+		itemLi.appendChild(inputWrapper)
+		item.appendChild(itemLi)
+		
+		sectionList.insertAdjacentElement('afterbegin', item)
+	},
+	addSingleUse(type) {
+		let sectionList = document.querySelector('.add-items-list')
+		
+		let item = document.createElement('label')
+		let itemLi = document.createElement('li')
+		let inputWrapper = document.createElement('div')
+		let qtyInput = DRAW.elementFactory('input', {
+			type:'number',
+			step:'0.01',
+			min:'0',
+			class:'qty',
+			onclick:'select()',
+			inputmode:'decimal',
+			placeholder: 'Qty',
+		})
+		qtyInput.addEventListener('blur', () => {
+			DATA.formatInput('currency', qtyInput)
+			console.log('New Item: ' + qtyInput.value)
+		})
+		
+		let nameInput = DRAW.elementFactory('input', {
+			type:'text',
+			class:'qty',
+			onclick:'select()',
+			placeholder: 'Name',
+		})
+		let costInput = DRAW.elementFactory('input', {
+			type:'number',
+			step:'0.01',
+			min:'0',
+			class:'qty',
+			onclick:'select()',
+			placeholder: 'Cost',
+		})
+		costInput.addEventListener('blur', () => {
+			DATA.formatInput('currency', costInput)
+			console.log('Cost: ' + costInput.value)
+		})
+		let unitSelect = DRAW.elementFactory('select',{
+			html: `
+			<optgroup name="Materials" label="Materials">
+				<option value="materials">Unit</option>
+				<option value="ft">Foot</option>
+			</optgroup>
+			<optgroup name="Labor" label="Labor">
+				<option value="labor">Hour</option>
+			</optgroup>`
+		})
+		
+		inputWrapper.appendChild(qtyInput)
+		inputWrapper.appendChild(nameInput)
+		inputWrapper.appendChild(costInput)
+		inputWrapper.appendChild(unitSelect)
+		itemLi.appendChild(inputWrapper)
+		item.appendChild(itemLi)
+		
+		sectionList.insertAdjacentElement('afterbegin', item)
 	},
 	addSection(column, name, data, headerClass) {
 		let section = DRAW.elementFactory('div', {class:'section-table'})
@@ -265,7 +369,7 @@ const DRAW = {
 			class: headerClass
 		})
 		let expandButton = DRAW.elementFactory('button', {
-			html: shownIcon,
+			html: '<i class="bi bi-caret-down-fill"></i>',
 			class:'expand-button'
 		})
 		expandButton.addEventListener('click', () => {
@@ -326,11 +430,11 @@ const DRAW = {
 	},
 	showSection(section, button) {
 		section.style.display = 'block'
-		button.innerHTML = shownIcon
+		button.innerHTML = '<i class="bi bi-caret-down-fill"></i>'
 	},
 	hideSection(section, button) {
 		section.style.display = 'none'
-		button.innerHTML = hiddenIcon
+		button.innerHTML = '<i class="bi bi-caret-right-fill"></i>'
 	},
 	printReadyCurrency(n) {
 		if (n) {
@@ -391,6 +495,7 @@ const DRAW = {
 			item.appendChild(cost)
 			document.querySelector('#print-materials-table').appendChild(item)
 		})
+		
 		//labor lines
 		DATA.labor.includes().forEach( x => {
 			let item = DRAW.elementFactory('div',{class:'table-entry'})
@@ -442,6 +547,16 @@ const DRAW = {
 				DRAW.showSection(x.querySelector('ul'),x.querySelector('button'))
 			}
 		})
+	}
+}
+
+class ITEM_unified {
+	constructor(name, section, cost, unit) {
+		this.name = name
+		this.section = section
+		this.cost = cost
+		this.unit = unit
+		this.qty = 0.00
 	}
 }
 
@@ -510,6 +625,9 @@ const DATA = {
 					includesData.push(x)
 				}
 			})
+			DATA.userAdded.includes().materials.forEach( x => {
+				includesData.push(x)
+			})
 			return includesData
 		},
 		total() {
@@ -543,6 +661,9 @@ const DATA = {
 					includesData.push(x)
 				}
 			})
+			DATA.userAdded.includes().labor.forEach( x => {
+				includesData.push(x)
+			})
 			return includesData
 		},
 		total() {
@@ -551,6 +672,38 @@ const DATA = {
 				total += x.qty * x.regWage
 			})
 			return total.toFixed(2)
+		}
+	},
+	userAdded: {
+		data: [],
+		newItem() {
+			let newItem = {
+				name:'',
+				cost:0,
+				qty:0,
+				unit:'whole',
+			}
+			DATA.userAdded.data.push(newItem)
+			return newItem
+		},
+		includes() {
+			let includesDataLabor = []
+			let includesDataMaterials = []
+			DATA.userAdded.data.forEach( x => {
+				if (x.name && x.cost && x.qty) {
+					if (x.unit === 'whole' || x.unit === 'ft') {
+						let xMaterial = new ITEM(x.name,'',x.cost,x.unit)
+						xMaterial.qty = x.qty
+						includesDataMaterials.push(xMaterial)
+					}
+					else if (x.unit === 'hrs') {
+						let xLabor = new RATE(x.name,x.cost,'')
+						xLabor.qty = x.qty
+						includesDataLabor.push(xLabor)
+					}
+				}
+			})
+			return {materials:includesDataMaterials,labor:includesDataLabor}
 		}
 	},
 	key: {
@@ -639,7 +792,5 @@ const DATA = {
 		return n
 	}
 }
-// sections
-let shownIcon = '<i class="bi bi-caret-down-fill"></i>'
-let hiddenIcon = '<i class="bi bi-caret-right-fill"></i>'
+
 APP.init()
