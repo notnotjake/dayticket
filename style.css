@@ -261,6 +261,9 @@ i {
 }
 
 
+.add-items {
+	display: none;
+}
 .add-items-header {
 	display: flex;
 	justify-content: space-between;
