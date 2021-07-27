@@ -128,6 +128,9 @@ const APP = {
 		DRAW.setDatePicker()
 		//clear needs to also clear the qty stored in the data layer
 	},
+	demoMode() {
+		console.log('demo')
+	}
 }
 const DRAW = {
 	elementFactory(elem, options) {
@@ -210,7 +213,11 @@ const DRAW = {
 			//button enrolls key
 			button.addEventListener('click', () => {
 				DATA.key.bakeCookies(DATA.key.name, input.value, 30)
-				if ( DATA.key.isValid() ) {
+				if (DATA.key.value() == 'demo') {
+					document.querySelector('.auth-container').remove()
+					APP.demoMode()
+				}
+				else if ( DATA.key.isValid() ) {
 					document.querySelector('.auth-container').remove()
 					APP.getData([DATA.materials,DATA.labor])
 				}
