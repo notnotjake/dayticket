@@ -114,7 +114,6 @@ const APP = {
 		
 	},
 	clearButton() {
-		const event = new Event('input')
 		document.querySelectorAll('input').forEach( (x) => {
 			x.value = ''
 		})
@@ -124,6 +123,8 @@ const APP = {
 		DATA.labor.includes().forEach( x => {
 			x.qty = ''
 		})
+		document.querySelector('.add-items-list').innerHTML = ''
+		DATA.userAdded.data = []
 		DRAW.setDatePicker()
 		//clear needs to also clear the qty stored in the data layer
 	},
