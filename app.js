@@ -129,7 +129,13 @@ const APP = {
 		//clear needs to also clear the qty stored in the data layer
 	},
 	demoMode() {
-		console.log('demo')
+		console.log('Running in Demo Mode')
+		DATA.materials.parseData(demoMaterialsData)
+		DATA.labor.parseData(demoLaborData)
+		APP.renderData(DATA.materials)
+		APP.renderData(DATA.labor)
+		APP.connected()
+		document.querySelector('.app-status h2').innerText = 'Demo Mode'
 	}
 }
 const DRAW = {
@@ -160,7 +166,7 @@ const DRAW = {
 		document.querySelector('#billing').disabled = false
 		document.querySelector('.input p').style.color = '#000000'
 		document.querySelector('#print').disabled = false
-		document.querySelector('#export').disabled = false
+		//document.querySelector('#export').disabled = false
 		document.querySelector('#clear').disabled = false
 	},
 	connectedStatus() {
@@ -559,7 +565,7 @@ const DRAW = {
 }
 
 class ITEM_unified {
-	constructor(name, section, cost, unit) {
+	constructor(name, section, cost, unit, qty) {
 		this.name = name
 		this.section = section
 		this.cost = cost

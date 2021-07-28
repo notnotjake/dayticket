@@ -138,8 +138,8 @@ input::-webkit-inner-spin-button {
 }
 #print {
 	margin-right: 0;
-	border-radius: 5px 0 0 5px;
-	border-right: 1px solid #e5e5e5;
+	//border-radius: 5px 0 0 5px;
+	//border-right: 1px solid #e5e5e5;
 }
 #export {
 	margin-left: 0;
