@@ -224,11 +224,11 @@ i {
 .section-table input {
 	position: relative;
 	box-sizing: border-box;
-	padding: 0 5px 0 10px;
+	padding: 0 5px 0 5px;
 	margin-right: 5px;
 	height: 100%;
 	min-height: 29px;
-	width: 60px;
+	width: 67px;
 	
 	background-color: #f0efeb;
 	border-radius: 0;

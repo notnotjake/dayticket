@@ -401,15 +401,17 @@ const DRAW = {
 			let placeholderText = ''
 			if (x.unit == 'whole') {
 				placeholderText = ''
+				type = 'number'
 			} else {
 				placeholderText = x.unit
+				type = 'text'
 			}
 			
 			let item = document.createElement('label')
 			let itemLi = document.createElement('li')
 			let inputWrapper = document.createElement('div')
 			let itemInput = DRAW.elementFactory('input', {
-				type:'number',
+				type: type,
 				step:'0.01',
 				min:'0',
 				class:'qty',
@@ -426,6 +428,7 @@ const DRAW = {
 			item.appendChild(itemLi)
 			
 			itemInput.addEventListener('blur', () => {
+				console.log(itemInput.value)
 				x.qty = DATA.formatInput(x.unit, itemInput)
 			})
 			
