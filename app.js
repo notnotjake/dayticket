@@ -117,6 +117,7 @@ const APP = {
 		document.querySelectorAll('input').forEach( (x) => {
 			x.value = ''
 		})
+		document.querySelector('.notes').value = ''
 		DATA.materials.includes().forEach( x => {
 			x.qty = ''
 		})
@@ -253,6 +254,7 @@ const DRAW = {
 	},
 	showAddItemSection() {
 		document.querySelector('.add-items').style.display = 'block'
+		document.querySelector('.notes').style.display = 'block'
 	},
 	addNewItem() {
 		let itemDataObj = DATA.userAdded.newItem()
@@ -477,6 +479,7 @@ const DRAW = {
 		document.querySelector('#print-builder').innerText = DATA.form.builder()
 		document.querySelector('#print-lot').innerText = DATA.form.lot()
 		document.querySelector('#print-date').innerText = DATA.form.dateString()
+		document.querySelector('#print-notes').innerText = DATA.form.notes()
 		//summary section
 		document.querySelector('#print-billed').innerText = DRAW.printReadyCurrency(DATA.form.billing())
 		document.querySelector('#print-labor-total').innerText = '$' + DATA.labor.total()
@@ -632,6 +635,9 @@ const DATA = {
 		},
 		billing() {
 			return DATA.formatInput('number', document.querySelector('#billing'))
+		},
+		notes() {
+			return document.querySelector('.notes').value
 		}
 	},
 	materials: {

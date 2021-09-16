@@ -349,6 +349,23 @@ input.name {
 }
 
 
+.notes {
+	display: none;
+	resize: none;
+	min-height: 90px;
+	width: 100%;
+	box-sizing: border-box;
+	border: none;
+	background: none;
+	border-radius: 5px;
+	background-color: #e9e8e3ff;
+	padding: 8px 8px;
+	font-size: 13px;
+}
+.notes::placeholder {
+	font-style: italic;
+}
+
 
 
 .app-controls {
@@ -485,7 +502,6 @@ input.name {
 		display: flex;
 		justify-content: space-between;
 		width: 3.3in;
-		margin-bottom: 8pt;
 	}
 	.print .builder {
 		width: 1.2in;
@@ -498,6 +514,11 @@ input.name {
 	.print .header h3 {
 		font-size: 12pt;
 		font-weight: 600;
+	}
+	.print .print-notes {
+		font-size: 9pt;
+		margin-top: 3pt;
+		margin-bottom: 5pt;
 	}
 	
 	.print h1 {
