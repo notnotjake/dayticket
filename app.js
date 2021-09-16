@@ -239,7 +239,7 @@ const DRAW = {
 		
 		DATA.key.bakeCookies(DATA.key.name, val, 30)
 		
-		if ( DATA.key.value() == 'demo' ) {
+		if ( DATA.key.value().toUpperCase() == 'DEMO' ) {
 			document.querySelector('.auth-container').remove()
 			APP.demoMode()
 		}
