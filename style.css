@@ -151,6 +151,7 @@ i {
 
 
 .collapseBtn-container {
+	display: none;
 	margin: 1px auto;
 	width: calc(100% - 24px);
 	max-width: calc(var(--max-width) - 24px);
@@ -570,5 +571,8 @@ input.name {
 	}
 	.column {
 		width: 100%;
+	}
+	.collapseBtn-container {
+		display: block;
 	}
 }
