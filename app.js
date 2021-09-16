@@ -138,6 +138,7 @@ const APP = {
 		document.querySelector('.app-status h2').innerText = 'Demo Mode'
 	}
 }
+
 const DRAW = {
 	elementFactory(elem, options) {
 		let objectNode = document.createElement(elem)
@@ -191,7 +192,7 @@ const DRAW = {
 				html:'<h2>Authenticate</h2><p>You\'re device will be remembered for 30 days</p>',
 				class:'auth-container'
 			})
-			let form = DRAW.elementFactory('div', {class:'new-auth'})
+			let form = DRAW.elementFactory('form', {class:'new-auth', action:'javascript:;', onsubmit:'DRAW.authSubmit(this)'})
 			let input = DRAW.elementFactory('input', {
 				type:'text',
 				id:'new-auth-key',
@@ -201,11 +202,17 @@ const DRAW = {
 				onclick:'select()'
 			})
 			input.value = DATA.key.value()
+			
 			let button = DRAW.elementFactory('button', {
 				html: '<i class="bi bi-arrow-right-circle-fill"></i>',
 				id:'new-auth-enroll',
 				disabled:'true',
 			})
+			
+			if ( input.value != '' ) {
+				button.disabled = false
+			}
+			
 			//activate button when input is not empty
 			input.addEventListener('input', () => {
 				document.querySelector('#auth-help').innerHTML = ''
@@ -214,21 +221,6 @@ const DRAW = {
 				}
 				else {
 					button.disabled = true
-				}
-			})
-			//button enrolls key
-			button.addEventListener('click', () => {
-				DATA.key.bakeCookies(DATA.key.name, input.value, 30)
-				if (DATA.key.value() == 'demo') {
-					document.querySelector('.auth-container').remove()
-					APP.demoMode()
-				}
-				else if ( DATA.key.isValid() ) {
-					document.querySelector('.auth-container').remove()
-					APP.getData([DATA.materials,DATA.labor])
-				}
-				else {
-					DRAW.auth('Key Invalid')
 				}
 			})
 			
@@ -241,6 +233,23 @@ const DRAW = {
 		}
 		
 		document.querySelector('#new-auth-key').select()
+	},
+	authSubmit(form) {
+		let val = form.querySelector('input').value
+		
+		DATA.key.bakeCookies(DATA.key.name, val, 30)
+		
+		if ( DATA.key.value() == 'demo' ) {
+			document.querySelector('.auth-container').remove()
+			APP.demoMode()
+		}
+		else if ( DATA.key.isValid() ) {
+			document.querySelector('.auth-container').remove()
+			APP.getData([DATA.materials,DATA.labor])
+		}
+		else {
+			DRAW.auth('Key Invalid')
+		}
 	},
 	showAddItemSection() {
 		document.querySelector('.add-items').style.display = 'block'
