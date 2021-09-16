@@ -5,7 +5,7 @@ Facilitates data-entry of job costs (material and labor) and generates formatted
 
 **Links:**
 
-🟢 [Live-Site](https://dayticket.advanceas.com)
+🟢 [Live-Site](https://dayticket.advanceas.com) (Use the key `demo` to try it out!)
 
 👋 [User-facing About](https://dayticket.advanceas.com/about)
 
