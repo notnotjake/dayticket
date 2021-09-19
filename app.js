@@ -64,6 +64,7 @@ const APP = {
 		DRAW.connectedStatus()
 		DRAW.setToolbarActive()
 		DRAW.showAddItemSection()
+		APP.keyboardNavigation()
 	},
 	renderData(dataObj) {
 		if (dataObj.name == 'Materials') {
@@ -137,6 +138,31 @@ const APP = {
 		APP.renderData(DATA.labor)
 		APP.connected()
 		document.querySelector('.app-status h2').innerText = 'Demo Mode'
+	},
+	keyboardNavigation() {
+		document.querySelector('.content-container').addEventListener('keydown', ( event ) => {
+			const inputs = document.querySelectorAll('input.qty')
+			
+			let inputsArray = []
+			inputs.forEach( n => inputsArray.push(n) )
+			
+			let activeInputIndex = inputsArray.indexOf(document.activeElement)
+			
+			if ( event.key == 'ArrowLeft' ) {
+				console.log('previous column')
+			}
+			else if ( event.key == 'ArrowRight' ) {
+				console.log('next column')
+			}
+			else if ( event.key == 'ArrowDown' ) {
+				event.preventDefault()
+				inputsArray[activeInputIndex + 1].focus()
+			}
+			else if ( event.key == 'ArrowUp' ) {
+				event.preventDefault()
+				inputsArray[activeInputIndex - 1].focus()
+			}
+		})
 	}
 }
 
@@ -439,7 +465,6 @@ const DRAW = {
 			item.appendChild(itemLi)
 			
 			itemInput.addEventListener('blur', () => {
-				console.log(itemInput.value)
 				x.qty = DATA.formatInput(x.unit, itemInput)
 			})
 			
