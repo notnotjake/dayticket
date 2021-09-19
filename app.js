@@ -140,25 +140,33 @@ const APP = {
 		document.querySelector('.app-status h2').innerText = 'Demo Mode'
 	},
 	keyboardNavigation() {
+		const columnCellsArray = ( target ) => {
+			let returnArray = Array.from(target.querySelectorAll('input.qty'))
+			returnArray = returnArray.filter( x => { return x.closest('.section-list').style.display === 'block' })
+			return returnArray
+		}
+		
+		const activeCell = () => {
+			let elem = document.activeElement
+			let column = elem.closest('.column')
+			let index = columnCellsArray(column).indexOf(elem)
+			
+			return { elem, column, index }
+		}
+		
 		document.querySelector('.content-container').addEventListener('keydown', ( event ) => {
 			if ( event.key == 'ArrowLeft' ) {
 				event.preventDefault()
 				
-				let activeCell = document.activeElement
-				
-				let currentColumn = activeCell.closest('.column')
-				
-				let cellArray = Array.from(currentColumn.querySelectorAll('input.qty'))
-				let activeCellIndex = cellArray.indexOf(activeCell)
-				
-				let targetColumn = currentColumn.previousElementSibling
+				let targetColumn = activeCell().column.previousElementSibling
 				
 				if ( targetColumn ) {
-					let targetCells = targetColumn.querySelectorAll('input.qty')
+					let targetCells = columnCellsArray( targetColumn )
 					
-					if ( targetCells.length > activeCellIndex ) {
-						targetCells[activeCellIndex].focus()
-					} else {
+					if ( targetCells.length > activeCell().index ) {
+						targetCells[activeCell().index].focus()
+					}
+					else {
 						targetCells[targetCells.length - 1].focus()
 					}
 				}
@@ -166,21 +174,15 @@ const APP = {
 			else if ( event.key == 'ArrowRight' ) {
 				event.preventDefault()
 				
-				let activeCell = document.activeElement
-				
-				let currentColumn = activeCell.closest('.column')
-				
-				let cellArray = Array.from(currentColumn.querySelectorAll('input.qty'))
-				let activeCellIndex = cellArray.indexOf(activeCell)
-				
-				let targetColumn = currentColumn.nextElementSibling
+				let targetColumn = activeCell().column.nextElementSibling
 				
 				if ( targetColumn ) {
-					let targetCells = targetColumn.querySelectorAll('input.qty')
+					let targetCells = columnCellsArray( targetColumn )
 					
-					if ( targetCells.length > activeCellIndex ) {
-						targetCells[activeCellIndex].focus()
-					} else {
+					if ( targetCells.length > activeCell().index ) {
+						targetCells[activeCell().index].focus()
+					}
+					else {
 						targetCells[targetCells.length - 1].focus()
 					}
 				}
@@ -188,27 +190,27 @@ const APP = {
 			else if ( event.key == 'ArrowDown' ) {
 				event.preventDefault()
 				
-				let cellArray = Array.from(document.querySelectorAll('input.qty'))
-				let targetCell = cellArray[ cellArray.indexOf(document.activeElement) + 1 ]
+				let cellsArray = columnCellsArray( document )
+				let targetCell = cellsArray[cellsArray.indexOf(activeCell().elem) + 1]
 				
 				if ( targetCell ) {
 					targetCell.focus()
 				}
 				else {
-					cellArray[0].focus()
+					cellsArray[0].focus()
 				}				
 			}
 			else if ( event.key == 'ArrowUp' ) {
 				event.preventDefault()
 				
-				let cellArray = Array.from(document.querySelectorAll('input.qty'))
-				let targetCell = cellArray[ cellArray.indexOf(document.activeElement) - 1 ]
+				let cellsArray = columnCellsArray( document )
+				let targetCell = cellsArray[cellsArray.indexOf(activeCell().elem) - 1]
 				
 				if ( targetCell ) {
 					targetCell.focus()
 				}
 				else {
-					cellArray[ cellArray.length - 1 ].focus()
+					cellsArray[cellsArray.length - 1].focus()
 				}
 			}
 		})
@@ -900,3 +902,7 @@ const DATA = {
 }
 
 APP.init()
+
+function test (x) {
+	return x.closest('.section-list').style.display === 'block'
+}
