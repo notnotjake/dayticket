@@ -145,7 +145,6 @@ const APP = {
 			returnArray = returnArray.filter( x => { return x.closest('.section-list').style.display === 'block' })
 			return returnArray
 		}
-		
 		const activeCell = () => {
 			let elem = document.activeElement
 			let column = elem.closest('.column')
@@ -154,8 +153,40 @@ const APP = {
 			return { elem, column, index }
 		}
 		
+		// Removes buttons from tab index
+		document.querySelectorAll('button').forEach( x => {
+			x.tabIndex = '-1'
+		})
+		
+		// Global Commands
+		document.addEventListener('keydown', ( event ) => {
+			if ( event.key === 'Enter' && (event.shiftKey || event.metaKey || event.ctrlKey) ) {
+				APP.printButton()
+			}
+			else if ( (event.key === 'ArrowUp') && (event.ctrlKey || event.metaKey) ) {
+				document.querySelector('#date').focus()
+			}
+			else if ( event.key === 'Backspace' && (event.ctrlKey || event.metaKey) ) {
+				if ( confirm("Are you sure you want to clear form?") ) {
+					APP.clearButton()
+				}
+			}
+		})
+		
+		// Cell Area Commands
 		document.querySelector('.content-container').addEventListener('keydown', ( event ) => {
-			if ( event.key == 'ArrowLeft' ) {
+			if ( event.key === 'ArrowDown' && event.altKey ) {
+				event.preventDefault()
+				
+				let columnCells = columnCellsArray(activeCell().column)
+				columnCells[columnCells.length - 1].focus()
+			}
+			else if ( event.key === 'ArrowUp' && event.altKey ) {
+				event.preventDefault()
+				
+				columnCellsArray(activeCell().column)[0].focus()
+			}
+			else if ( event.key == 'ArrowLeft' ) {
 				event.preventDefault()
 				
 				let targetColumn = activeCell().column.previousElementSibling
@@ -187,7 +218,7 @@ const APP = {
 					}
 				}
 			}
-			else if ( event.key == 'ArrowDown' ) {
+			else if ( (event.key == 'ArrowDown' || event.key === 'Enter') && !event.shiftKey && !event.metaKey && !event.ctrlKey ) {
 				event.preventDefault()
 				
 				let cellsArray = columnCellsArray( document )
@@ -472,7 +503,7 @@ const DRAW = {
 		})
 		let expandButton = DRAW.elementFactory('button', {
 			html: '<i class="bi bi-caret-down-fill"></i>',
-			class:'expand-button'
+			class:'expand-button',
 		})
 		expandButton.addEventListener('click', () => {
 			if (sectionList.style.display == 'block') {
