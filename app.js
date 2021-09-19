@@ -141,26 +141,75 @@ const APP = {
 	},
 	keyboardNavigation() {
 		document.querySelector('.content-container').addEventListener('keydown', ( event ) => {
-			const inputs = document.querySelectorAll('input.qty')
-			
-			let inputsArray = []
-			inputs.forEach( n => inputsArray.push(n) )
-			
-			let activeInputIndex = inputsArray.indexOf(document.activeElement)
-			
 			if ( event.key == 'ArrowLeft' ) {
-				console.log('previous column')
+				event.preventDefault()
+				
+				let activeCell = document.activeElement
+				
+				let currentColumn = activeCell.closest('.column')
+				
+				let cellArray = Array.from(currentColumn.querySelectorAll('input.qty'))
+				let activeCellIndex = cellArray.indexOf(activeCell)
+				
+				let targetColumn = currentColumn.previousElementSibling
+				
+				if ( targetColumn ) {
+					let targetCells = targetColumn.querySelectorAll('input.qty')
+					
+					if ( targetCells.length > activeCellIndex ) {
+						targetCells[activeCellIndex].focus()
+					} else {
+						targetCells[targetCells.length - 1].focus()
+					}
+				}
 			}
 			else if ( event.key == 'ArrowRight' ) {
-				console.log('next column')
+				event.preventDefault()
+				
+				let activeCell = document.activeElement
+				
+				let currentColumn = activeCell.closest('.column')
+				
+				let cellArray = Array.from(currentColumn.querySelectorAll('input.qty'))
+				let activeCellIndex = cellArray.indexOf(activeCell)
+				
+				let targetColumn = currentColumn.nextElementSibling
+				
+				if ( targetColumn ) {
+					let targetCells = targetColumn.querySelectorAll('input.qty')
+					
+					if ( targetCells.length > activeCellIndex ) {
+						targetCells[activeCellIndex].focus()
+					} else {
+						targetCells[targetCells.length - 1].focus()
+					}
+				}
 			}
 			else if ( event.key == 'ArrowDown' ) {
 				event.preventDefault()
-				inputsArray[activeInputIndex + 1].focus()
+				
+				let cellArray = Array.from(document.querySelectorAll('input.qty'))
+				let targetCell = cellArray[ cellArray.indexOf(document.activeElement) + 1 ]
+				
+				if ( targetCell ) {
+					targetCell.focus()
+				}
+				else {
+					cellArray[0].focus()
+				}				
 			}
 			else if ( event.key == 'ArrowUp' ) {
 				event.preventDefault()
-				inputsArray[activeInputIndex - 1].focus()
+				
+				let cellArray = Array.from(document.querySelectorAll('input.qty'))
+				let targetCell = cellArray[ cellArray.indexOf(document.activeElement) - 1 ]
+				
+				if ( targetCell ) {
+					targetCell.focus()
+				}
+				else {
+					cellArray[ cellArray.length - 1 ].focus()
+				}
 			}
 		})
 	}
