@@ -128,7 +128,7 @@ const APP = {
 		document.querySelector('.add-items-list').innerHTML = ''
 		DATA.userAdded.data = []
 		DRAW.setDatePicker()
-		//clear needs to also clear the qty stored in the data layer
+		document.querySelector('#date').focus()
 	},
 	demoMode() {
 		console.log('Running in Demo Mode')
@@ -163,13 +163,34 @@ const APP = {
 			if ( event.key === 'Enter' && (event.shiftKey || event.metaKey || event.ctrlKey) ) {
 				APP.printButton()
 			}
-			else if ( (event.key === 'ArrowUp') && (event.ctrlKey || event.metaKey) ) {
-				document.querySelector('#date').focus()
-			}
 			else if ( event.key === 'Backspace' && (event.ctrlKey || event.metaKey) ) {
 				if ( confirm("Are you sure you want to clear form?") ) {
 					APP.clearButton()
 				}
+			}
+			else if ( (event.key === 'ArrowUp') && (event.ctrlKey || event.metaKey) ) {
+				document.querySelector('#date').focus()
+			}
+		})
+		
+		// Toolbar Commands
+		document.querySelector('.toolbar-inputs').addEventListener('keydown', ( event ) => {
+			if ( event.key === 'Enter' ) {
+				if ( document.activeElement.id === 'date' ) {
+					document.querySelector('#builder').focus()
+				}
+				else if ( document.activeElement.id === 'builder' ) {
+					document.querySelector('#lot').focus()
+				}
+				else if ( document.activeElement.id === 'lot' ) {
+					document.querySelector('#billing').focus()
+				}
+				else if ( document.activeElement.id === 'billing' ) {
+					columnCellsArray( document.querySelector('.content-container') )[0].focus()
+				}
+			}
+			else if ( event.key === 'ArrowDown' && document.activeElement.id !== 'date' ) {
+				columnCellsArray( document.querySelector('.content-container') )[0].focus()
 			}
 		})
 		
@@ -186,7 +207,7 @@ const APP = {
 				
 				columnCellsArray(activeCell().column)[0].focus()
 			}
-			else if ( event.key == 'ArrowLeft' ) {
+			else if ( event.key === 'ArrowLeft' ) {
 				event.preventDefault()
 				
 				let targetColumn = activeCell().column.previousElementSibling
@@ -202,7 +223,7 @@ const APP = {
 					}
 				}
 			}
-			else if ( event.key == 'ArrowRight' ) {
+			else if ( event.key === 'ArrowRight' ) {
 				event.preventDefault()
 				
 				let targetColumn = activeCell().column.nextElementSibling
@@ -218,7 +239,7 @@ const APP = {
 					}
 				}
 			}
-			else if ( (event.key == 'ArrowDown' || event.key === 'Enter') && !event.shiftKey && !event.metaKey && !event.ctrlKey ) {
+			else if ( (event.key === 'ArrowDown' || event.key === 'Enter') && !event.shiftKey && !event.metaKey && !event.ctrlKey && !document.activeElement.classList.contains('notes') ) {
 				event.preventDefault()
 				
 				let cellsArray = columnCellsArray( document )
@@ -231,7 +252,7 @@ const APP = {
 					cellsArray[0].focus()
 				}				
 			}
-			else if ( event.key == 'ArrowUp' ) {
+			else if ( event.key === 'ArrowUp') {
 				event.preventDefault()
 				
 				let cellsArray = columnCellsArray( document )
@@ -242,6 +263,26 @@ const APP = {
 				}
 				else {
 					cellsArray[cellsArray.length - 1].focus()
+				}
+			}
+			else if ( event.key === 'Tab' ) {
+				let sectionsList = Array.from(document.querySelectorAll('.section-table'))
+				sectionsList = sectionsList.filter( x => { return x.querySelector('.section-list').style.display !== 'none' })				
+				
+				let current = document.activeElement.closest('.section-table')
+				let i = sectionsList.indexOf(current)
+				
+				if ( event.shiftKey ) { i-- } else { i++ }
+				
+				let targetSection = sectionsList[i]
+				
+				if ( targetSection && !targetSection.classList.contains('add-items') ) {
+					event.preventDefault()
+					let targetSectionCells = Array.from(targetSection.querySelectorAll('input.qty'))
+					let target = targetSectionCells[0]
+					if ( target ) {
+						target.focus()
+					}
 				}
 			}
 		})
