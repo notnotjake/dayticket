@@ -2,14 +2,59 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Advance | DayTicket Cost Report</title>
+		<title>Dayticket Entry ▶︎ Help</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="style.css">
+		<style>
+			/* Fonts */
+			@import url('https://rsms.me/inter/inter.css');
+			@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css");
+			html, button, input, select, textarea {
+				font-family: 'Inter', sans-serif;
+			}
+			@supports (font-variation-settings: normal) {
+				html, button, input, select, textarea {
+					font-family: 'Inter var', sans-serif;
+				}
+			}
+			
+			body {
+				background-color: #fbf9f6;
+				width: calc(100% - 20px);
+				max-width: 600px;
+				margin: auto; 
+			}
+			div {
+				padding: 18px 22px 12px;
+				margin: 30px 0;
+				background-color: #ecebe9;
+				border-radius: 7px;
+			}
+			h1 {
+				margin-top: 4px;
+				text-align: center;
+				color: #4a8b95;
+				font-weight: 700;
+				font-size: 24px;
+			}
+			p {
+				font-weight: 350;
+			}
+		</style>
 	</head>
 	
 	
 	<body>
-		<h1>Help</h1>
-		<p>If you having trouble with the verification key, email me for help</p>
+		<div class="contact">
+			<h1>Contact</h1>
+			<p>If you need help, have a problem or a request, <a href="mailto:support@notnotjake.com?subject=Advance Dayticket Help">send me an email.</a></p>
+		</div>
+		<div class="auth">
+			<h1>Authentication</h1>
+			<p>You don't need to create an account to use this app but you will need an Authentication Key. If you don't have one or lost your key, contact me for a new one. Authenticating with this key will log you in and you will stay logged in for 30 days. Every time you use the app, you're authentication is extended another 30 days.</p>
+		</div>
+		<div class="keyboard">
+			<h1>Editing the Table Data</h1>
+			<p>At the bottom of the app, just above the link that brought you here, there is a link to your AirTable data. On AirTable, you can edit items costs, add items or add sections. You will need to have an AirTable account and be invited to access the table. If you don't have access you can request access</p>
+		</div>
 	</body>
 </html>
