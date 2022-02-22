@@ -498,10 +498,13 @@ const DRAW = {
 		}
 	},
 	showAddItemSection() {
+		// The Add Item Section is hard coded in HTML, but hidden until auth is completed
 		document.querySelector('.add-items').style.display = 'block'
 		document.querySelector('.notes').style.display = 'block'
 	},
 	addNewItem() {
+		// Manages the creation of new, single use items
+		
 		let itemDataObj = DATA.userAdded.newItem()
 		itemDataObj.name = 'Testing'
 		
@@ -516,7 +519,6 @@ const DRAW = {
 		let qtyInput = DRAW.elementFactory('input',{
 			type:'number',
 			step:'0.01',
-			min:'0',
 			class:'qty',
 			onclick:'select()',
 			inputmode:'decimal',
@@ -537,7 +539,6 @@ const DRAW = {
 		let costInput = DRAW.elementFactory('input',{
 			type:'number',
 			step:'0.01',
-			min:'0',
 			class:'cost',
 			onclick:'select()',
 			placeholder:'Cost'
@@ -582,7 +583,6 @@ const DRAW = {
 		let qtyInput = DRAW.elementFactory('input', {
 			type:'number',
 			step:'0.01',
-			min:'0',
 			class:'qty',
 			onclick:'select()',
 			inputmode:'decimal',
@@ -602,7 +602,6 @@ const DRAW = {
 		let costInput = DRAW.elementFactory('input', {
 			type:'number',
 			step:'0.01',
-			min:'0',
 			class:'qty',
 			onclick:'select()',
 			placeholder: 'Cost',
@@ -669,7 +668,6 @@ const DRAW = {
 			let itemInput = DRAW.elementFactory('input', {
 				type: type,
 				step:'0.01',
-				min:'0',
 				class:'qty',
 				id:'qty'+(x.name),
 				onclick:'select()',
@@ -684,6 +682,7 @@ const DRAW = {
 			item.appendChild(itemLi)
 			
 			itemInput.addEventListener('blur', () => {
+				console.log(itemInput.value)
 				x.qty = DATA.formatInput(x.unit, itemInput)
 			})
 			
@@ -1024,8 +1023,10 @@ const DATA = {
 			console.log('API Key Cookie Extended for 30 Days')
 		}
 	},
+	// Here lies the issue:
 	formatInput(type, input) {
 		let n = input.value
+		console.log(n)
 		
 		if (type != 'whole' && n != '') {
 			while (n.includes(',')) {
@@ -1041,6 +1042,9 @@ const DATA = {
 			n = parseInt(n)
 			input.value = n
 		}
+		
+		console.log('N: ' + n)
+		
 		return n
 	},
 	mathInline(n) {
