@@ -1060,9 +1060,11 @@ const DATA = {
 			n = dividend / divisor
 		} else if (n.includes('-')) {
 			index = n.search('-')
-			term1 = parseFloat(n.substring(0, index) )
-			term2 = parseFloat(n.substring(index+1) )
-			n = term1 - term2
+			if (index != 0) {
+				term1 = parseFloat(n.substring(0, index) )
+				term2 = parseFloat(n.substring(index+1) )
+				n = term1 - term2
+			}			
 		} else if (n.includes('+')) {
 			index = n.search('\\+')
 			term1 = parseFloat(n.substring(0, index) )
