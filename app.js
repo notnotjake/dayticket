@@ -682,7 +682,7 @@ const DRAW = {
 			item.appendChild(itemLi)
 			
 			itemInput.addEventListener('blur', () => {
-				console.log(itemInput.value)
+				//console.log(itemInput.value)
 				x.qty = DATA.formatInput(x.unit, itemInput)
 			})
 			
@@ -709,9 +709,16 @@ const DRAW = {
 	},
 	printReadyCurrency(n) {
 		if (n) {
-			let string = '$'
-			string += parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-			return string
+			if (n < 0) {
+				//Accounting Formatting for Negative Num
+				let string = '($' + parseFloat(n * -1).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ")"
+				return string
+			}
+			else {
+				// Normal, Positive Values
+				let string = '$' + parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+				return string
+			}
 		}
 		else {
 			return '-'
@@ -725,9 +732,12 @@ const DRAW = {
 		document.querySelector('#print-notes').innerText = DATA.form.notes()
 		//summary section
 		document.querySelector('#print-billed').innerText = DRAW.printReadyCurrency(DATA.form.billing())
-		document.querySelector('#print-labor-total').innerText = '$' + DATA.labor.total()
-		document.querySelector('#print-materials-total').innerText = '$' + DATA.materials.total()
-		document.querySelector('#print-total-cost').innerText = '$' + DATA.totalCost()
+		
+		document.querySelector('#print-labor-total').innerText = DRAW.printReadyCurrency(DATA.labor.total())
+		
+		document.querySelector('#print-materials-total').innerText = DRAW.printReadyCurrency(DATA.materials.total())
+		
+		document.querySelector('#print-total-cost').innerText = DRAW.printReadyCurrency(DATA.totalCost())
 		
 		if (DATA.form.billing()) {
 			document.querySelector('#print-gross-num').innerText = DRAW.printReadyCurrency(DATA.grossProfit().num)
@@ -759,8 +769,10 @@ const DRAW = {
 				text: `${x.qty}${placeholderText}`,
 				class:'column-2'
 			})
+			
 			let cost = DRAW.elementFactory('p',{class:'column-3'})
-			cost.innerText = '$' + parseFloat(x.qty * x.cost).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+			let totalCost = (x.qty * x.cost)
+			cost.innerText = DRAW.printReadyCurrency(totalCost)
 			
 			item.appendChild(name)
 			item.appendChild(qty)
@@ -776,12 +788,15 @@ const DRAW = {
 				text: `${x.name} ($${x.regWage}/hr)`,
 				class:'column-1'
 			})
+			
 			let qty = DRAW.elementFactory('p',{
 				text: x.qty,
 				class:'column-2'
 			})
+			
 			let cost = DRAW.elementFactory('p',{class:'column-3'})
-			cost.innerText = '$' + parseFloat(x.qty * x.regWage).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+			let totalCost = (x.qty * x.regWage)
+			cost.innerText = DRAW.printReadyCurrency(totalCost)
 			
 			item.appendChild(name)
 			item.appendChild(qty)
@@ -795,7 +810,7 @@ const DRAW = {
 			class:'column-1'
 		}))
 		materialsTaxLine.appendChild(DRAW.elementFactory('p',{
-			text:`$${DATA.materials.salesTax()}`,
+			text: DATA.materials.salesTax(),
 			class:'column-2'
 		}))
 		document.querySelector('#print-materials-table').appendChild(materialsTaxLine)
@@ -914,10 +929,12 @@ const DATA = {
 		},
 		salesTax() {
 			let tax = 0
+			let taxRate = 0.06
 			DATA.materials.includes().forEach( x => {
-				tax += (x.qty * x.cost) * 0.06
+				tax += (x.qty * x.cost) * taxRate
 			})
-			return tax.toFixed(2)
+			
+			return DRAW.printReadyCurrency(tax)
 		}
 	},
 	labor: {
@@ -1026,7 +1043,6 @@ const DATA = {
 	// Here lies the issue:
 	formatInput(type, input) {
 		let n = input.value
-		console.log(n)
 		
 		if (type != 'whole' && n != '') {
 			while (n.includes(',')) {
@@ -1042,8 +1058,6 @@ const DATA = {
 			n = parseInt(n)
 			input.value = n
 		}
-		
-		console.log('N: ' + n)
 		
 		return n
 	},
