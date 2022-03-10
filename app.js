@@ -440,7 +440,7 @@ const DRAW = {
 			})
 			let form = DRAW.elementFactory('form', {class:'new-auth', action:'javascript:;', onsubmit:'DRAW.authSubmit(this)'})
 			let input = DRAW.elementFactory('input', {
-				type:'text',
+				type:'password',
 				id:'new-auth-key',
 				placeholder:'Security Key',
 				autofocus:'true',
