@@ -1040,7 +1040,6 @@ const DATA = {
 			console.log('API Key Cookie Extended for 30 Days')
 		}
 	},
-	// Here lies the issue:
 	formatInput(type, input) {
 		let n = input.value
 		
