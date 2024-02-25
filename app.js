@@ -314,7 +314,7 @@ const DRAW = {
 	},
 	auth(condition) {
 		if (condition) {
-			document.querySelector('#new-auth-key').value = DATA.key.value()
+			document.querySelector('#current-password').value = DATA.key.value()
 			document.querySelector('#auth-help').innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>' + condition
 		}
 		else {
@@ -325,8 +325,10 @@ const DRAW = {
 			let form = DRAW.elementFactory('form', {class:'new-auth', action:'javascript:;', onsubmit:'DRAW.authSubmit(this)'})
 			let input = DRAW.elementFactory('input', {
 				type:'password',
-				id:'new-auth-key',
-				placeholder:'Security Key',
+				id:'current-password',
+				name:'current-password',
+				autocomplete:'current-password',
+				placeholder:'Password',
 				autofocus:'true',
 				required:'true',
 				onclick:'select()'
@@ -362,7 +364,7 @@ const DRAW = {
 			document.querySelector('.app-controls').insertAdjacentElement('afterbegin', authForm)
 		}
 		
-		document.querySelector('#new-auth-key').select()
+		document.querySelector('#current-password').select()
 	},
 	authSubmit(form) {
 		let val = form.querySelector('input').value
