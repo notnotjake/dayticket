@@ -9,112 +9,18 @@ const APP = {
 			DRAW.auth()
 		}
 	},
-	async analytic(action) {
-		// Updates analytics numbers in AirTable
-		// Use 'load' or 'report'
-		
-		// Get Analytics
-		const reqURL = `https://api.airtable.com/v0/app9sUZzisuGNjntz/Analytics`
-		
-		let data = await fetch(reqURL, {
-			method: "GET",
-			withCredentials: true,
-			headers: {
-				"Authorization": `Bearer ${DATA.key.value()}`
-			}
-		})
-		data = await data.json()
-		
-		let loads = 0
-		let reports = 0
-		
-		if ( data.records[0].fields.Activity === 'Loads' ) {
-			loads = data.records[0].fields.Count
-			reports = data.records[1].fields.Count
-		}
-		else {
-			reports = data.records[0].fields.Count
-			loads = data.records[1].fields.Count
-		}
-		
-		// Update Values
-		if (action === 'load') {
-			loads++
-			data = `{
-					"records": [
-						{
-							"id": "recVrcepPmqnCnssK",
-							"fields": {
-								"Activity": "Loads",
-								"Count": ${loads}
-							}
-						}
-					]
-				}`
-		}
-		else if (action === 'report') {
-			reports++
-			data = `{
-				"records": [
-					{
-						"id": "recQuccjMbsxYRnwW",
-						"fields": {
-							"Activity": "Reports",
-							"Count": ${reports}
-						}
-					}
-				]
-			}`
-		}
-		else {
-			console.log('No argument passed. Use "load" or "report" to increment either.')
-			data = ``
-		}
-		
-		// PATCH to AirTable 
-		const reqPromise = fetch(reqURL, {
-			method: "PATCH",
-			withCredentials: true,
-			headers: {
-				"Authorization": `Bearer ${DATA.key.value()}`,
-				"Content-Type": `application/json`
-			},
-			body: data
-		})
-		reqPromise
-			.then(res => {
-				if (res.status == 401) {
-					throw Error("Authentication Error")
-				} else if (res.status == 404) {
-					throw Error("Could not connect to server")
-				} else if (!res.ok) {
-					throw Error("Something Went Wrong - " + response.status + ": " + response.statusText)
-				} else {
-					//console.log(res)
-				}
-			})
-			.catch(err => {
-				console.error(err)
-			})
-		
-		// Log Results
-		console.log(`Updated Analytics: loads: ${loads}, reports: ${reports}`)
-	},
 	getData(dataObjList) {
 		let helpText = ''
 		let firstTime = true
 		let firstError = true
 		
-		APP.analytic('load')
-		
 		dataObjList.forEach( (dataObj) => {
-			const reqURL = `https://api.airtable.com/v0/app9sUZzisuGNjntz/${encodeURI(dataObj.at)}`
+			const reqURL = `https://services.lightdance.dev/api/advance/${encodeURI(dataObj.at)}`
 			console.log("Trying to get " + dataObj.name + " at URL: " + reqURL)
 			const reqPromise = fetch(reqURL, {
 				method: "GET",
-				withCredentials: true,
 				headers: {
-					"Authorization": `Bearer ${DATA.key.value()}`
+					"Authorization": `${DATA.key.value()}`
 				}
 			})
 			reqPromise
@@ -122,7 +28,7 @@ const APP = {
 					if (res.status == 401) {
 						helpText = 'Key Rejected'
 						throw Error("Authentication Error")
-					} else if (res.status == 404) {
+					} else if (res.status == 500 || res.status == 404 || res.status == 502) {
 						helpText = 'Couldn\'t Connect to Server'
 						throw Error("Record Not Found")
 					} else if (!res.ok) {
@@ -133,7 +39,7 @@ const APP = {
 					}
 				})
 				.then(resData => {
-					dataObj.parseData(resData.records)
+					dataObj.parseData(resData)
 					console.log(dataObj.name + ' Data Retrieved Successfully:')
 					APP.renderData(dataObj)
 					
