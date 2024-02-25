@@ -85,36 +85,15 @@ const APP = {
 		watch.addEventListener('blur', () => {
 			
 		})
-		
 		itemInput.addEventListener('blur', () => {
 			x.qty = DATA.formatInput(x.unit, itemInput)
 		})
 	},
 	printButton() {
-		if ( DATA.key.isValid() ) {
-			APP.analytic('report')
-		}
 		document.title = 'Dayticket_' + DATA.form.builder() + '_Lot-' + DATA.form.lot() +'_' + DATA.form.dateString()
 		DRAW.printingPress()
 		window.print()
 		document.title = 'Dayticket Entry'
-	},
-	exportButton() {
-		download('test.txt', 'hello world')
-		
-		function download(filename, contents) {
-			var element = document.createElement('a')
-			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('Hello World'))
-			element.setAttribute('download', filename)
-			
-			element.style.display = 'none'
-			document.body.appendChild(element)
-			
-			element.click()
-			
-			document.body.removeChild(element)
-		}
-		
 	},
 	clearButton() {
 		document.querySelectorAll('input').forEach( (x) => {
@@ -319,7 +298,6 @@ const DRAW = {
 		document.querySelector('#billing').disabled = false
 		document.querySelector('.input p').style.color = '#000000'
 		document.querySelector('#print').disabled = false
-		//document.querySelector('#export').disabled = false
 		document.querySelector('#clear').disabled = false
 	},
 	connectedStatus() {
@@ -806,7 +784,7 @@ const DATA = {
 	},
 	materials: {
 		name: 'Materials',
-		at: 'Materials?view=Sorted',
+		at: 'materials',
 		data: [],
 		parseData(data) {
 			data.forEach( i => {
@@ -845,7 +823,7 @@ const DATA = {
 	},
 	labor: {
 		name: 'Labor',
-		at: 'Labor?view=Sorted',
+		at: 'labor',
 		data: [],
 		parseData(data) {
 			data.forEach( i => {
@@ -919,7 +897,6 @@ const DATA = {
 			else {
 				return ''
 			}
-			
 		},
 		isValid() {
 			if ( typeof document.cookie == 'undefined' || document.cookie == '' || !document.cookie.includes(DATA.key.name) || DATA.key.value() == '') {
