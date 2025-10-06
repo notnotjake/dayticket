@@ -15,7 +15,7 @@ const APP = {
 		let firstError = true
 		
 		dataObjList.forEach( (dataObj) => {
-			const reqURL = `https://services.lightdance.dev/api/advance/${encodeURI(dataObj.at)}`
+			const reqURL = `https://advance-dayticket-production.up.railway.app/${encodeURI(dataObj.at)}`
 			console.log("Trying to get " + dataObj.name + " at URL: " + reqURL)
 			const reqPromise = fetch(reqURL, {
 				method: "GET",
